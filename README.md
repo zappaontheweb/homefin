@@ -70,7 +70,7 @@ Open the printed URL, enter `local-test` as the setup token and pick **Demo data
 ## What's inside
 
 - **Any bank or card:** teach homefin a new export format once with **Learn format** (CSV/XLSX, any column layout, language, date and number style); matching files are then recognised automatically.
-- **Built-in importers:** American Express (Italy, `.xlsx`), Revolut (`.csv`), Mediobanca Premier "MP" (`.xlsx`/`.csv`), Fineco (`.xlsx`).
+- **Built-in importers:** American Express and Revolut. Other banks supported: Mediobanca Premier, Fineco.
 - **One household per deployment:** every deployment stores one workspace under a single KV key; configurable members, owner keywords and equal/custom shared split.
 - **Expenses, income and cash flow:** every row is an *expense*, *income* or *excluded*; income has its own tab, Trends shows net cash flow and a current-month forecast.
 - **Time Machine:** keep up to 5 full snapshots in KV and restore any of them in one click.
@@ -88,7 +88,7 @@ Open the printed URL, enter `local-test` as the setup token and pick **Demo data
 4. [Create and connect a KV store](#4-create-and-connect-a-kv-store)
 5. [Environment variables](#5-environment-variables)
 6. [First-run setup](#6-first-run-setup)
-7. [Importing statements](#7-importing-statements) — including [Learn format](#learn-format--any-bank-or-card)
+7. [Importing statements](#7-importing-statements) — including [any other bank or card](#any-other-bank-or-card--learn-format)
 8. [Everyday use](#8-everyday-use)
 9. [Local development](#9-local-development)
 10. [Troubleshooting](#10-troubleshooting)
@@ -168,51 +168,41 @@ Go to **Profile → Data & Import**, pick the **Bank / card**, then **Import Exc
 
 Fictional sample files for every format are in [`samples/`](samples/) — import them into a demo workspace to see what each importer does. Regenerate with `npm run samples` and verify parsing with `npm run check:samples`.
 
-### Learn format — any bank or card
+### American Express — `.xlsx`
 
-For any provider without a built-in importer (or to replace one):
+- Export: Amex website → *Statements & activity* → download the spending summary as **Excel** (the importer reads the Italian-language Amex export).
+- Expected columns: *Date, Description, Cardholder, Amount, Reference, Country*; title rows above the table may carry the statement period.
+- Owner: taken from the **Cardholder** column and matched to household members by name/keywords.
+- Periods: Amex statements run from the 21st to the 20th; the dashboard can show either **Amex periods** or **calendar months**. Day/month swaps from Excel are auto-corrected using the statement period.
+- Excluded automatically: the card-settlement rows that pay off the statement balance.
+
+### Revolut — `.csv`
+
+- Export: Revolut app → account → *Statement* → **CSV**. Export one file per account.
+- Revolut CSVs contain no owner information, so choose the **Revolut account** (one per member, plus *Shared* when you have 2+ members) before importing.
+- Only completed rows are imported. Foreign-currency rows are converted to EUR with daily ECB rates from the public Frankfurter API.
+- Excluded automatically: top-ups/deposits, transfers (including pockets), currency exchanges, interest.
+
+### Other banks supported
+
+Mediobanca Premier, Fineco.
+
+### Any other bank or card — Learn format
+
+homefin is not limited to the banks above. Train it once on any provider's export and it imports that format from then on:
 
 1. **Profile → Data & Import → Learn format** (admins) and pick one sample export (`.csv`, `.txt`, `.tsv`, `.xlsx`, `.xls`).
 2. homefin detects, and lets you correct:
    - **Sheet** and **header row** — title or account-info rows above the table are skipped automatically.
    - **Columns** — date (plus an optional value-date fallback), description (plus an optional second description column that gets appended), and optional currency, holder/cardholder, bank category, status, country and transaction ID.
-   - **Amounts** — one signed column, separate money-out / money-in columns, or an amount plus a debit/credit indicator column (e.g. `DR`/`CR`, `D`/`C`, `Dare`/`Avere`).
-   - **Reading rules** — date order (day/month vs month/day; ISO, `20260901`, Excel dates and month names in English, Italian, German, French and Spanish are always understood), decimal separator, whether money out is shown as negative (bank accounts) or positive (credit cards), and whether money coming in counts as **income**, a **refund** (reduces spending) or is **ignored**. Incoming rows that look like refunds (*refund, rimborso, Rückerstattung, remboursement, reembolso, …*) always count as refunds.
+   - **Amounts** — one signed column, separate money-out / money-in columns, or an amount plus a debit/credit indicator column (e.g. `DR`/`CR`, `D`/`C`, `Debit`/`Credit`).
+   - **Reading rules** — date order (day/month vs month/day; ISO, `20260901`, Excel dates and month names in English, Italian, German, French and Spanish are always understood), decimal separator, whether money out is shown as negative (bank accounts) or positive (credit cards), and whether money coming in counts as **income**, a **refund** (reduces spending) or is **ignored**. Incoming rows that look like refunds (the word *refund* in several languages) always count as refunds.
    - **Owner** — a household member, *Shared*, or per row from the holder column (matched against member names and keywords).
    - **Exclusions** — description keywords to exclude (card settlements, transfers between your own accounts, investments; pre-filled, editable), an option to exclude transfers to accounts of household members, and status values to skip (pending, declined, reverted…).
 3. The **live preview** shows exactly how the first rows will be imported (date, description, owner, Expense/Income/Refund/Excluded, amount) and why any row would be skipped.
 4. **Save format**, or **Save & import this file**. A Time Machine backup is created first.
 
 From then on the format appears in the **Bank / card** list, and any file whose header row matches it is recognised automatically — even if another bank is selected. Each row gets a stable reference (the provider's transaction ID when mapped, otherwise date + amount + description + an occurrence counter), so overlapping exports never create duplicates. Foreign-currency rows are converted to EUR with daily ECB rates (Frankfurter API). Saved formats can be edited or deleted from the same panel; deleting a format keeps the transactions already imported.
-
-### American Express (Italy) — `.xlsx`
-
-- Export: Amex website → *Statements & activity* → download the spending summary as **Excel**.
-- Expected layout: a header row `Data | Descrizione | Titolare | Importo | Riferimento | Paese` (title rows above it may carry the statement period, e.g. *"dal 21 agosto 2026 a 20 settembre 2026"*).
-- Owner: taken from **Titolare** (cardholder) and matched to household members by name/keywords.
-- Periods: Amex statements run from the 21st to the 20th; the dashboard can show either **Amex periods** or **calendar months**. Day/month swaps from Excel are auto-corrected using the statement period.
-- Excluded automatically: card-settlement rows (*"addebito in c/c salvo buon fine"*, *"saldo … carta"*).
-
-### Revolut — `.csv`
-
-- Export: Revolut app → account → *Statement* → **CSV** (English or Italian headers both work). Export one file per account.
-- Revolut CSVs contain no owner information, so choose the **Revolut account** (one per member, plus *Shared* when you have 2+ members) before importing.
-- Only `COMPLETED` rows are imported. Foreign-currency rows are converted to EUR with daily ECB rates from the public Frankfurter API.
-- Excluded automatically: top-ups/deposits, transfers (including pockets), currency exchanges, interest.
-
-### MP (Mediobanca Premier) — `.xlsx` / `.csv`
-
-- Export: online banking → current account movements → **Excel** or **CSV**.
-- **MP account**: *Detect from file* uses the `Intestatari` metadata of Excel exports; CSV exports have no holder information, so pick the member (or *Shared*).
-- Expected layout: a metadata block (`Rapporto`, `Intestatari`, `Divisa`, …) followed by `Data contabile | Data valuta | Tipologia | Entrate | Uscite | Divisa`.
-- Owner: from **Intestatari**. One matching member → personal account; two or more → **Shared** account (split by the household split). No match → the first member (add owner keywords to fix).
-- Excluded automatically: income, securities/investment flows, credit-card statement payments, transfers to brokers/other banks and to accounts owned by household members.
-
-### Fineco — `.xlsx`
-
-- Export: online banking → *Movimenti* → **Excel**.
-- Expected layout: header rows starting `Conto Corrente: …` and `Intestazione Conto Corrente: …`, then `Data Operazione | Data Valuta | Entrate | Uscite | Descrizione | Descrizione Completa | Stato | Moneymap`.
-- Owner detection and exclusions work like MP.
 
 ### Backups
 

@@ -230,7 +230,7 @@ function getRevolutAccountOption(id) {
   const options = revolutAccountOptions();
   return options.find((o) => o.id === id) || options[0] || { id: '', accountName: 'Revolut', holder: '', accountScope: '', personalFlag: 'personale' };
 }
-function revolutAccountLabel(optionOrId, lang = 'it') {
+function revolutAccountLabel(optionOrId, lang = 'en') {
   const option = typeof optionOrId === 'string' ? getRevolutAccountOption(optionOrId) : optionOrId;
   return lang === 'en' ? (option?.labelEn || 'Account') : (option?.labelIt || 'Account');
 }
@@ -238,7 +238,7 @@ function revolutAccountLabel(optionOrId, lang = 'it') {
 const MP_AUTO_ACCOUNT = { id: 'auto', labelIt: 'Rileva dal file', labelEn: 'Detect from file' };
 function mpAccountOptions() { return [MP_AUTO_ACCOUNT, ...memberAccountOptions('MP')]; }
 function getMpAccountOption(id) { return mpAccountOptions().find((o) => o.id === id) || MP_AUTO_ACCOUNT; }
-function mpAccountLabel(optionOrId, lang = 'it') {
+function mpAccountLabel(optionOrId, lang = 'en') {
   const option = typeof optionOrId === 'string' ? getMpAccountOption(optionOrId) : optionOrId;
   return lang === 'en' ? (option?.labelEn || 'Account') : (option?.labelIt || 'Account');
 }
@@ -265,7 +265,7 @@ function getImportSourceOptions(store) {
 function getImportSourceOptionForStore(id, store) {
   return getImportSourceOptions(store).find((o) => o.id === id || o.source === id) || getImportSourceOption(id);
 }
-function accountImportLabel(optionOrId, lang = 'it') {
+function accountImportLabel(optionOrId, lang = 'en') {
   const option = typeof optionOrId === 'string' ? getImportSourceOption(optionOrId) : optionOrId;
   return lang === 'en' ? (option?.labelEn || option?.accountName || 'Account') : (option?.labelIt || option?.accountName || 'Account');
 }
@@ -338,14 +338,14 @@ function withDefaultTransactionSource(tx, importedAt = '') {
 function getImportHistory(store) {
   return Array.isArray(store?.importHistory) ? store.importHistory : [];
 }
-function formatImportTimestamp(value, lang = 'it') {
+function formatImportTimestamp(value, lang = 'en') {
   if (!value) return '—';
   const d = new Date(value);
   if (Number.isNaN(d.getTime())) return String(value);
   return d.toLocaleString(lang === 'it' ? 'it-IT' : 'en-GB', { dateStyle:'short', timeStyle:'short' });
 }
 
-function formatFinancialBreakdown(breakdown = {}, lang = 'it') {
+function formatFinancialBreakdown(breakdown = {}, lang = 'en') {
   const labels = lang === 'it'
     ? { deposit: 'depositi', transfer: 'trasferimenti', exchange: 'cambi valuta', interest: 'interessi', income: 'entrate', internal_transfer: 'giroconti/trasferimenti interni', card_payment: 'pagamenti carta/estratti conto', investment: 'titoli/investimenti', zero_amount: 'zero', other: 'altro' }
     : { deposit: 'deposits', transfer: 'transfers', exchange: 'exchanges', interest: 'interest', income: 'income', internal_transfer: 'internal transfers', card_payment: 'card payments/statements', investment: 'securities/investments', zero_amount: 'zero', other: 'other' };
@@ -1138,7 +1138,7 @@ function normalizeCashflowTransaction(tx, store = null) {
     incomeManualOverride: cashflowType === 'income' ? 'income' : (tx.incomeManualOverride || ''),
   };
 }
-function cashflowTypeLabel(type, lang = 'it') {
+function cashflowTypeLabel(type, lang = 'en') {
   const cashflowType = normalizeCashflowTypeValue(type) || 'expense';
   if (cashflowType === 'income') return tr(lang, 'cashflowIncome');
   if (cashflowType === 'excluded') return tr(lang, 'cashflowExcluded');
@@ -1173,7 +1173,7 @@ const INCOME_AMBIGUOUS_PATTERNS = ['bonifico', 'bank transfer', 'accredito', 'cr
 const INCOME_LEARNING_MAX_RULES = 200;
 const INCOME_GENERIC_SIGNATURES = new Set(['bonifico', 'bank transfer', 'accredito', 'credit transfer', 'versamento', 'deposito', 'incoming', 'payment', 'transfer']);
 
-function incomeCategoryLabel(key, lang = 'it') {
+function incomeCategoryLabel(key, lang = 'en') {
   const rule = INCOME_CATEGORY_RULES.find((r) => r.key === key);
   if (!rule) return lang === 'en' ? 'Other income' : 'Altre entrate';
   return lang === 'en' ? rule.en : rule.it;
@@ -1240,7 +1240,7 @@ function latestIncomeLearningRuleForTx(store, tx) {
     return latest;
   }, null)?.rule || null;
 }
-function classifyIncomeTx(tx, lang = 'it', store = null) {
+function classifyIncomeTx(tx, lang = 'en', store = null) {
   const amount = Number(tx?.amount || 0);
   const desc = normalizeText(`${tx?.desc || tx?.description || ''} ${tx?.category || ''} ${tx?.accountName || ''}`);
   const manual = tx?.incomeManualOverride === 'income' || tx?.incomeManualOverride === 'not_income' ? tx.incomeManualOverride : '';
@@ -1266,7 +1266,7 @@ function classifyIncomeTx(tx, lang = 'it', store = null) {
     incomeCategoryLabel: incomeCategoryLabel(incomeCategory, lang),
   };
 }
-function buildIncomeModel(transactions, aggregateKeys, viewMode, store, lang = 'it', categoryConfig = BASE_CAT_CONFIG) {
+function buildIncomeModel(transactions, aggregateKeys, viewMode, store, lang = 'en', categoryConfig = BASE_CAT_CONFIG) {
   const validKeys = new Set(aggregateKeys || []);
   const periodRows = (transactions || [])
     .map((tx, idx) => {
@@ -2840,14 +2840,14 @@ function UserMenuModal({ store, currentUserId, theme, lang, onClose, embedded = 
 
         {section === 'personalization' && <><div className="profile-section-title"><IconLabel icon="customization">{T('customization')}</IconLabel></div><div className="personalization-layout" style={{ display:'grid', gridTemplateColumns:'minmax(220px,320px) 1fr', gap:16 }}><div><div style={{ fontSize:12, color:theme.subtext, fontWeight:800, marginBottom:6 }}>{T('colorTheme')}</div><select style={input} value={form.themeMode || 'dark'} onChange={e=>update({themeMode:e.target.value})}>{THEME_OPTIONS.map(t=><option key={t.key} value={t.key}>{t.label}</option>)}</select><button onClick={savePersonalization} style={{ marginTop:12, width:'100%', background:theme.accent, border:'none', color:'#fff', borderRadius:12, padding:'11px 14px', cursor:'pointer', fontWeight:900 }}>{T('saveCustomization')}</button></div><div className="personalization-categories" style={{ maxHeight:520, overflow:'auto', border:'1px solid '+theme.border, borderRadius:16 }}>{Object.entries(catDraft).filter(([key])=>!isPersonalCategory(key)).map(([key,cfg]) => <div className="personalization-cat-row" key={key} style={{ display:'grid', gridTemplateColumns:'80px 1fr 90px 90px', gap:10, alignItems:'center', padding:12, borderBottom:'1px solid '+theme.border }}><select style={{...input, textAlign:'center'}} value={cfg.icon || '🏷️'} onChange={e=>setCatDraft(d=>({...d,[key]:{...d[key],icon:e.target.value}}))}>{EMOJI_CHOICES.map(e=><option key={e} value={e}>{e}</option>)}</select><input style={input} value={categoryLabelForInput(key, cfg, uiLang)} onChange={e=>setCatDraft(d=>({...d,[key]:{...d[key],label:e.target.value,labelEdited:true}}))} /><input type="color" style={{ width:'100%', height:40, border:'none', background:'transparent' }} value={cfg.color || '#888888'} onChange={e=>setCatDraft(d=>({...d,[key]:{...d[key],color:e.target.value}}))} /><button onClick={()=>onDeleteCategory?.(key)} disabled={key==='altro'} title={key==='altro'?T('cannotDeleteOther'):T('deleteCategory')} style={{background:key==='altro'?theme.soft:'transparent',border:'1px solid '+theme.border,borderRadius:10,color:key==='altro'?theme.subtext:'#EF4444',padding:'9px 10px',fontWeight:800,cursor:key==='altro'?'not-allowed':'pointer'}}>{T('delete')}</button></div>)}</div></div></>}
         {section === 'household' && isAdmin && <><div className="profile-section-title"><IconLabel icon="account">{T('household')}</IconLabel></div><div className="hf-section-copy" style={{marginBottom:14}}>{T('householdHelp')}</div><HouseholdEditor value={householdDraft} onChange={setHouseholdDraft} theme={theme} input={input} T={T} /><div className="profile-actions" style={{marginTop:14}}><button className="profile-primary-btn" onClick={saveHousehold}>{T('saveHousehold')}</button>{householdMsg && <span className="hf-section-copy" style={{marginLeft:12}}>{householdMsg}</span>}</div></>}
-        {section === 'users' && isAdmin && <><div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', gap:12, marginBottom:14, flexWrap:'wrap' }}><div className="profile-section-title" style={{marginBottom:0}}><IconLabel icon="users">{T('userManagement')}</IconLabel></div></div><div style={{ display:'grid', gap:10, marginBottom:18 }}>{ids.map(id => { const locked = id===firstAdminId; return <div key={id} style={{display:'grid',gridTemplateColumns:'1fr 130px 110px',gap:10,alignItems:'center',padding:12,border:'1px solid '+theme.border,borderRadius:14,background:theme.panelAlt}}><div><div style={{fontWeight:900}}>{users[id]?.name || id}</div><div style={{fontSize:12,color:theme.subtext}}>{id} · {locked ? T('firstAdminLocked') : (users[id]?.role === 'admin' ? T('admin') : T('standardUser'))}</div></div><select style={input} value={users[id]?.role || 'user'} onChange={e=>onSaveUsers?.({...users,[id]:{...users[id],role:e.target.value}})} disabled={locked}>{['admin','user'].map(r=><option key={r} value={r}>{r==='admin'?T('admin'):T('standardUser')}</option>)}</select><button disabled={locked} onClick={()=>{ if(locked) return; if(!window.confirm(T('deleteUserConfirm'))) return; const next={...users}; delete next[id]; onSaveUsers?.(next); }} style={{background:locked?theme.soft:'transparent',border:'1px solid '+theme.border,borderRadius:12,color:locked?theme.subtext:'#EF4444',padding:'10px 12px',fontWeight:900,cursor:locked?'not-allowed':'pointer'}}>{T('delete')}</button></div>; })}</div><div style={{padding:14,border:'1px solid '+theme.border,borderRadius:16,background:theme.soft,marginBottom:16}}><div className="hf-icon-label" style={{fontWeight:900,marginBottom:10}}><Icon name="users" /> <span>{T('addUser')}</span></div><div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(180px,1fr))',gap:10}}><input style={input} placeholder={T('name')} value={newUser.name} onChange={e=>setNewUser(u=>({...u,name:e.target.value}))}/><input style={input} type='password' placeholder={T('password')} value={newUser.password} onChange={e=>setNewUser(u=>({...u,password:e.target.value}))}/><select style={input} value={newUser.role} onChange={e=>setNewUser(u=>({...u,role:e.target.value}))}><option value='user'>{T('standardUser')}</option><option value='admin'>{T('admin')}</option></select><button onClick={()=>{ const id=userIdFromName(newUser.name); if(!newUser.name.trim()||!newUser.password.trim()) return; if(newUser.password.length<8){ alert(T('passwordTooShort')); return; } const created={id,name:newUser.name.trim(),newPassword:newUser.password,role:newUser.role,language:uiLang,createdAt:new Date().toISOString()}; onSaveUsers?.({...users,[id]:created}); setCreatedUser({ name: created.name, id, password: newUser.password }); setNewUser({name:'',password:'',role:'user',language:uiLang}); }} style={{background:theme.accent,border:'none',color:'#fff',borderRadius:12,padding:'10px 12px',fontWeight:900,cursor:'pointer'}}>{T('addUser')}</button></div>{createdUser && <div style={{marginTop:12,padding:12,border:'1px solid '+theme.border,borderRadius:12,background:theme.panel}}><div style={{fontWeight:900,marginBottom:4}}>{T('sharePassword')}</div><div style={{fontSize:13,color:theme.subtext,marginBottom:8}}>{T('passwordCreatedHelp')}</div><div style={{display:'grid',gridTemplateColumns:'1fr auto',gap:8}}><input readOnly style={input} value={`${createdUser.id} / ${createdUser.password}`} /><button onClick={()=>navigator.clipboard?.writeText(`${createdUser.id} / ${createdUser.password}`)} style={{background:theme.input,border:'1px solid '+theme.border,color:theme.text,borderRadius:12,padding:'10px 12px',fontWeight:900,cursor:'pointer'}}>{T('copyPassword')}</button></div></div>}</div><div style={{border:'1px solid '+theme.border,borderRadius:16,overflow:'hidden'}}><div style={{padding:12,fontWeight:900,background:theme.panelAlt}}>{T('permissions')}</div><table style={{width:'100%',borderCollapse:'collapse',fontSize:13}}><thead><tr style={{background:theme.soft}}><th style={{textAlign:'left',padding:10}}>{T('feature')}</th><th style={{padding:10}}>{T('admin')}</th><th style={{padding:10}}>{T('standardUser')}</th></tr></thead><tbody>{[[T('viewData'),true,true],[T('editData'),true,false],[T('editRules'),true,false],[T('manageCustomization'),true,false],[T('manageUsers'),true,false]].map(([feature,admin,user])=><tr key={feature} style={{borderTop:'1px solid '+theme.border}}><td style={{padding:10,fontWeight:800}}>{feature}</td><td style={{padding:10,textAlign:'center'}}>{admin?<Icon name="check" />:'—'}</td><td style={{padding:10,textAlign:'center'}}>{user?<Icon name="check" />:'—'}</td></tr>)}</tbody></table></div></>}
+        {section === 'users' && isAdmin && <><div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', gap:12, marginBottom:14, flexWrap:'wrap' }}><div className="profile-section-title" style={{marginBottom:0}}><IconLabel icon="users">{T('userManagement')}</IconLabel></div></div><div style={{ display:'grid', gap:10, marginBottom:18 }}>{ids.map(id => { const locked = id===firstAdminId; return <div key={id} style={{display:'grid',gridTemplateColumns:'1fr 130px 110px',gap:10,alignItems:'center',padding:12,border:'1px solid '+theme.border,borderRadius:14,background:theme.panelAlt}}><div><div style={{fontWeight:900}}>{users[id]?.name || id}</div><div style={{fontSize:12,color:theme.subtext}}>{id} · {locked ? T('firstAdminLocked') : (users[id]?.role === 'admin' ? T('admin') : T('standardUser'))}</div></div><select style={input} value={users[id]?.role || 'user'} onChange={e=>onSaveUsers?.({...users,[id]:{...users[id],role:e.target.value}})} disabled={locked}>{['admin','user'].map(r=><option key={r} value={r}>{r==='admin'?T('admin'):T('standardUser')}</option>)}</select><button disabled={locked} onClick={()=>{ if(locked) return; if(!window.confirm(T('deleteUserConfirm'))) return; const next={...users}; delete next[id]; onSaveUsers?.(next); }} style={{background:locked?theme.soft:'transparent',border:'1px solid '+theme.border,borderRadius:12,color:locked?theme.subtext:'#EF4444',padding:'10px 12px',fontWeight:900,cursor:locked?'not-allowed':'pointer'}}>{T('delete')}</button></div>; })}</div><div style={{padding:14,border:'1px solid '+theme.border,borderRadius:16,background:theme.soft,marginBottom:16}}><div className="hf-icon-label" style={{fontWeight:900,marginBottom:10}}><Icon name="users" /> <span>{T('addUser')}</span></div><div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(180px,1fr))',gap:10}}><input style={input} placeholder={T('name')} value={newUser.name} onChange={e=>setNewUser(u=>({...u,name:e.target.value}))}/><input style={input} type='password' placeholder={T('password')} value={newUser.password} onChange={e=>setNewUser(u=>({...u,password:e.target.value}))}/><select style={input} value={newUser.role} onChange={e=>setNewUser(u=>({...u,role:e.target.value}))}><option value='user'>{T('standardUser')}</option><option value='admin'>{T('admin')}</option></select><button onClick={()=>{ const id=userIdFromName(newUser.name); if(!newUser.name.trim()||!newUser.password.trim()) return; if(newUser.password.length<8){ alert(T('passwordTooShort')); return; } const created={id,name:newUser.name.trim(),newPassword:newUser.password,role:newUser.role,language:'en',createdAt:new Date().toISOString()}; onSaveUsers?.({...users,[id]:created}); setCreatedUser({ name: created.name, id, password: newUser.password }); setNewUser({name:'',password:'',role:'user',language:'en'}); }} style={{background:theme.accent,border:'none',color:'#fff',borderRadius:12,padding:'10px 12px',fontWeight:900,cursor:'pointer'}}>{T('addUser')}</button></div>{createdUser && <div style={{marginTop:12,padding:12,border:'1px solid '+theme.border,borderRadius:12,background:theme.panel}}><div style={{fontWeight:900,marginBottom:4}}>{T('sharePassword')}</div><div style={{fontSize:13,color:theme.subtext,marginBottom:8}}>{T('passwordCreatedHelp')}</div><div style={{display:'grid',gridTemplateColumns:'1fr auto',gap:8}}><input readOnly style={input} value={`${createdUser.id} / ${createdUser.password}`} /><button onClick={()=>navigator.clipboard?.writeText(`${createdUser.id} / ${createdUser.password}`)} style={{background:theme.input,border:'1px solid '+theme.border,color:theme.text,borderRadius:12,padding:'10px 12px',fontWeight:900,cursor:'pointer'}}>{T('copyPassword')}</button></div></div>}</div><div style={{border:'1px solid '+theme.border,borderRadius:16,overflow:'hidden'}}><div style={{padding:12,fontWeight:900,background:theme.panelAlt}}>{T('permissions')}</div><table style={{width:'100%',borderCollapse:'collapse',fontSize:13}}><thead><tr style={{background:theme.soft}}><th style={{textAlign:'left',padding:10}}>{T('feature')}</th><th style={{padding:10}}>{T('admin')}</th><th style={{padding:10}}>{T('standardUser')}</th></tr></thead><tbody>{[[T('viewData'),true,true],[T('editData'),true,false],[T('editRules'),true,false],[T('manageCustomization'),true,false],[T('manageUsers'),true,false]].map(([feature,admin,user])=><tr key={feature} style={{borderTop:'1px solid '+theme.border}}><td style={{padding:10,fontWeight:800}}>{feature}</td><td style={{padding:10,textAlign:'center'}}>{admin?<Icon name="check" />:'—'}</td><td style={{padding:10,textAlign:'center'}}>{user?<Icon name="check" />:'—'}</td></tr>)}</tbody></table></div></>}
       </div>
     </div>
   </div>;
 }
 
 function AppShellLoader() {
-  return <div style={{ minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', background: THEMES.dark.bg, color: THEMES.dark.text, fontFamily:"'Inter',system-ui" }}>{tr('it','loading')}</div>;
+  return <div style={{ minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', background: THEMES.dark.bg, color: THEMES.dark.text, fontFamily:"'Inter',system-ui" }}>{tr(lsGet(LS.lang) === 'it' ? 'it' : 'en','loading')}</div>;
 }
 
 export default function App() {
@@ -2960,6 +2960,7 @@ export default function App() {
     lsSet(LS.user, resolvedUserId);
     setCurrentUserId(resolvedUserId);
     const u = getUsers(normalized)[resolvedUserId];
+    lsSet(LS.lang, u?.language === 'it' ? 'it' : 'en');
     if (u?.themeMode && THEMES[u.themeMode]) setThemeMode(u.themeMode); else if (u?.themeMode && !THEMES[u.themeMode]) setThemeMode('dark');
     setStore(normalized);
     if (Number(normalized?.meta?.amexDateGuardLastFixedCount || 0) > 0) { try { await apiSet(normalized); } catch (e) { console.error('Amex date guard sync error', e); } }
@@ -3333,6 +3334,7 @@ export default function App() {
   const setCurrentLanguage = async (language) => {
     const nextLanguage = language === 'it' ? 'it' : 'en';
     if (!store || !currentUserId) return;
+    lsSet(LS.lang, nextLanguage);
     const users = getUsers(store);
     const current = users[currentUserId] || {};
     const next = { ...store, users: { ...users, [currentUserId]: { ...current, language: nextLanguage } } };
