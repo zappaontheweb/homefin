@@ -1507,6 +1507,7 @@ function BrandLogo({ compact = false, theme = THEMES.dark }) {
 }
 
 const STITCH_ICON_PATHS = {
+  more: <><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></>,
   overview: <><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></>,
   income: <><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/><path d="M5 21h14"/></>,
   trends: <><path d="m3 16 4-4 4 4 4-4 6 6"/><path d="M18 12h4v4"/></>,
@@ -1776,71 +1777,72 @@ function Login({ onLogin }) {
 }
 
 const THEMES = {
+  // "Quiet Ledger" palette: calm neutrals, one accent, no gradients. Values mirror the CSS tokens in redesign.css.
   dark: {
     name: 'dark',
-    bg: '#0A0F0D',
-    panel: '#1A1D1C',
-    panelAlt: '#181D1A',
-    soft: '#262B29',
-    border: 'rgba(255,255,255,0.10)',
-    text: '#DFE4E0',
-    subtext: '#BACAC5',
-    accent: '#2DD4BF',
-    accentSoft: 'rgba(45,212,191,0.12)',
-    accentAlt: '#60A5FA',
-    success: '#57F1DB',
-    shadow: '0 1px 0 rgba(255,255,255,0.04), 0 16px 40px rgba(0,0,0,0.18)',
-    input: '#181D1A',
-    inputBg: '#181D1A',
-    tooltipBg: '#181D1A',
-    tooltipBorder: 'rgba(133,148,144,0.24)',
+    bg: '#0C0D0F',
+    panel: '#131417',
+    panelAlt: '#17181C',
+    soft: '#1D1F24',
+    border: 'rgba(255,255,255,0.08)',
+    text: '#ECEDEF',
+    subtext: '#9A9EA6',
+    accent: '#4FD1B5',
+    accentSoft: 'rgba(79,209,181,0.12)',
+    accentAlt: '#8AB4F8',
+    success: '#4FD1B5',
+    shadow: 'none',
+    input: '#17181C',
+    inputBg: '#17181C',
+    tooltipBg: '#1B1C20',
+    tooltipBorder: 'rgba(255,255,255,0.10)',
     chipBg: 'rgba(255,255,255,0.04)',
-    headerGradient: 'linear-gradient(180deg, rgba(10,15,13,0.90) 0%, rgba(15,20,18,0.72) 100%)',
-    splitA: '#8FB8FF',
-    splitB: '#F4C76B',
-    navBg: '#0A0F0D',
-    navText: '#DFE4E0',
-    totalGreen: '#2DD4BF',
-    loginBg: '#0A0F0D',
-    heroPanel: 'linear-gradient(145deg,#1A1D1C 0%,#12231F 58%,#0A0F0D 100%)',
-    gradientPrimary: 'linear-gradient(135deg,#57F1DB 0%,#2DD4BF 58%,#1F6F5E 100%)',
-    onAccent: '#05231C'
+    headerGradient: '#0C0D0F',
+    splitA: '#8AB4F8',
+    splitB: '#E9B872',
+    navBg: '#0C0D0F',
+    navText: '#ECEDEF',
+    totalGreen: '#4FD1B5',
+    loginBg: '#0C0D0F',
+    heroPanel: '#131417',
+    gradientPrimary: '#4FD1B5',
+    onAccent: '#06241D'
   },
   light: {
     name: 'light',
-    bg: '#F8FAFC',
+    bg: '#F7F7F5',
     panel: '#FFFFFF',
-    panelAlt: '#F3F6FA',
-    soft: '#E8EEF3',
-    border: 'rgba(26,54,93,0.12)',
-    text: '#18212C',
-    subtext: '#5E6B78',
-    accent: '#0F766E',
-    accentSoft: 'rgba(15,118,110,0.08)',
-    accentAlt: '#2563EB',
-    success: '#0F766E',
-    shadow: '0 1px 0 rgba(255,255,255,0.7), 0 14px 34px rgba(15,23,42,0.06)',
+    panelAlt: '#FBFBFA',
+    soft: '#F1F1EE',
+    border: 'rgba(20,20,15,0.09)',
+    text: '#17181A',
+    subtext: '#62656B',
+    accent: '#0E7A63',
+    accentSoft: 'rgba(14,122,99,0.08)',
+    accentAlt: '#2F5FD0',
+    success: '#0E7A63',
+    shadow: 'none',
     input: '#FFFFFF',
     inputBg: '#FFFFFF',
     tooltipBg: '#FFFFFF',
-    tooltipBorder: 'rgba(26,54,93,0.12)',
-    chipBg: 'rgba(26,54,93,0.05)',
-    headerGradient: 'linear-gradient(180deg, rgba(248,250,252,0.94) 0%, rgba(248,250,252,0.86) 100%)',
-    splitA: '#2563EB',
-    splitB: '#B45309',
-    navBg: '#F8FAFC',
-    navText: '#18212C',
-    totalGreen: '#059669',
-    loginBg: '#F8FAFC',
-    heroPanel: 'linear-gradient(145deg,#FFFFFF 0%,#F6F8FB 62%,#EAF7F4 100%)',
-    gradientPrimary: 'linear-gradient(135deg,#5EEAD4 0%,#0F766E 100%)',
-    onAccent: '#05231C'
+    tooltipBorder: 'rgba(20,20,15,0.10)',
+    chipBg: 'rgba(20,20,15,0.04)',
+    headerGradient: '#F7F7F5',
+    splitA: '#2F5FD0',
+    splitB: '#B26A12',
+    navBg: '#F7F7F5',
+    navText: '#17181A',
+    totalGreen: '#0E7A63',
+    loginBg: '#F7F7F5',
+    heroPanel: '#FFFFFF',
+    gradientPrimary: '#0E7A63',
+    onAccent: '#FFFFFF'
   }
 };
 const THEME_OPTIONS = [{ key:'dark', label:'Scuro / Dark' }, { key:'light', label:'Chiaro / Light' }];
 const I18N = {
   it: { profile:'Profilo', personalProfile:'Profilo personale', data:'Dati', customization:'Personalizzazione', saveProfile:'Salva profilo', saveCustomization:'Salva personalizzazione', dark:'Scuro', light:'Chiaro', overview:'Spese', categories:'Categorie', perUser:'Per utente', rules:'Regole', totalSpend:'Spesa totale', selectedRange:'Periodi inclusi', allHistory:'Tutto lo storico', goUpload:'Nessun periodo caricato. Vai su Dati per caricare lo storico.', sync:'Sync KV', importExcel:'Import Excel', exportJson:'Export JSON', importBackup:'Import Backup', language:'Lingua dashboard', displayedName:'Nome visualizzato', username:'Username', gender:'Genere', email:'Email', phone:'Telefono', password:'Password', sections:'Sezioni', user:'Utente', all:'Tutti', personalOnly:'Solo personali', commonOnly:'Solo comuni', allCategories:'Tutte le categorie', spendTrend:'Trend spesa', selectedRangeSubSingle:'periodo', selectedRangeSubPlural:'periodi', allUsers:'Tutti gli utenti', clickAll:'Clicca per tornare a tutti', ofTotal:'del totale', selectedRangeBlock:'Range selezionato', calendarMonth:'Mese calendario', amexPeriod:'Periodo Amex', calendar:'Calendario', allYears:'Tutti gli anni', fullYear:'Intero anno', fromPeriod:'Da periodo…', toPeriod:'A periodo…', topCategories:'Top categorie', subscriptions:'Abbonamenti rilevati', distribution:'Distribuzione', categoryDistribution:'Distribuzione categorie', categoryTrend:'Trend categorie', trendSplit:'Trend split', monthlyTrend:'Trend mensile', categoriesByUser:'Categorie per utente', userFilteredCategoryTrend:'Trend categorie · filtro utente applicato', subtotal:'Subtotale selezione corrente', filteredTransactions:'transazioni filtrate', newCategory:'＋ Nuova categoria…', doNotChange:'Non modificare', active:'Attiva', field:'Campo', match:'Match', text:'Testo', category:'Categoria', personalFlag:'Flag personale', actions:'Azioni', categorizationRules:'Regole di categorizzazione', rulesHelp:'Le regole vengono applicate ai nuovi upload. Puoi applicarle a qualsiasi campo del DB; gli override manuali restano prioritari.', newRule:'+ Nuova regola', applyRetro:'↩ Applica retroattivamente', suggestions:'Suggerimenti da override manuali', contains:'contiene', startsWith:'inizia con', equals:'è uguale a', endsWith:'finisce con', create:'Crea', delete:'Elimina', merchantDesc:'Merchant / descrizione', holder:'Titolare', country:'Paese', min:'Min', max:'Max', subscription:'Abbonamento', calendarPeriod:'Periodo calendario', statementPeriod:'Periodo Amex', reference:'Riferimento', personal:'Personale', common:'Comune', onlyPersonalLower:'solo personali', onlyCommonLower:'solo comuni', allLower:'tutti', colorTheme:'Tema colore per questo utente', cannotDeleteOther:'Altro non può essere eliminata', deleteCategory:'Elimina categoria', loginSub:'Login con utente e password', initialPassword:'Password iniziale:', initialPasswordHelp:'Potrai cambiarla dal Profilo.', optionalUser:'Utente (opzionale al primo accesso)', login:'Accedi', show:'Mostra', hide:'Nascondi', notSpecified:'Non indicato', prefix:'Prefisso', phoneNumber:'Numero', newPassword:'Nuova password', confirmNewPassword:'Conferma nuova password', back:'Torna', loading:'Caricamento…', year:'Anno', period:'Periodo', month:'Mese', view:'Vista', amexPeriodEnding:'Periodo Amex con chiusura al 20', fullYearPrefix:'Anno', date:'Data', description:'Descrizione', amount:'Importo €', flag:'Flag', dismissSuggestion:'Cestina suggerimento', overrideCount:'override', overrideCountPlural:'override', readingExcel:'📖 Lettura Excel…', updated:'✅ Aggiornato:', fileImportError:'Errore importazione file', invalidBackup:'Il file non sembra un backup valido', restoreBackupConfirm:'Stai per RIPRISTINARE l\'intero database dal backup JSON:', restoreBackupWarning:'Questa operazione sovrascrive il contenuto KV corrente. Confermi?', transactions:'transazioni', rulesCount:'regole', customCategoriesCount:'categorie custom', overridesCount:'override', backupImported:'✅ Backup JSON importato e salvato su KV', backupImportError:'Errore import backup JSON', invalidEmail:'Email non valida', passwordsDontMatch:'Le due password non coincidono', profileUpdated:'✅ Profilo utente aggiornato', deleteCategoryConfirmStart:'Eliminare la categoria', deleteCategoryConfirmBody:'Le transazioni, le regole e gli override associati saranno rimappati su Altro. Nessuna transazione o regola verrà cancellata.', other:'Altro', remappedToOther:'rimappata su Altro', personalizationSaved:'✅ Personalizzazione salvata', newCategoryPrompt:'Nome nuova categoria', ruleCategoryPrompt:'Categoria target: scrivi nome/chiave, oppure lascia vuoto per non modificare la categoria', invalidCategory:'Categoria non valida. Usa una categoria già esistente oppure creala prima dal tab Dati.', retroApplied:'✅ Regole applicate retroattivamente', included:'inclusi', filteredRows:'righe filtrate', filter:'Filtra', workspace:'Navigazione', accountArea:'Account', users:'Utenti', userManagement:'Gestione utenti', addUser:'Aggiungi utente', role:'Ruolo', admin:'Admin', standardUser:'Utente', createAdmin:'Crea account admin', uploadDatabase:'Carica database', setupTitle:'Configura homefin', setupSubtitle:'Crea il primo amministratore, definisci il nucleo familiare e scegli i dati di partenza. Il setup si esegue una sola volta per deployment.', setupDatabaseHelp:'Un backup JSON di homefin oppure un estratto Excel Amex.', setupReady:'Database pronto', createAccount:'Crea account', setupDone:'Setup completato', name:'Nome', setupPasswordHelp:'Almeno 8 caratteri. Viene salvata solo come hash PBKDF2 sul server.', logout:'Logout' },
-  en: { profile:'Profile', personalProfile:'Personal profile', data:'Data', customization:'Customization', saveProfile:'Save profile', saveCustomization:'Save customization', dark:'Dark', light:'Light', overview:'Expense', categories:'Categories', perUser:'By user', rules:'Rules', totalSpend:'Total spend', selectedRange:'Included periods', allHistory:'Full history', goUpload:'No periods loaded yet. Go to Data to upload your history.', sync:'Sync KV', importExcel:'Import Excel', exportJson:'Export JSON', importBackup:'Import Backup', language:'Dashboard language', displayedName:'Display name', username:'Username', gender:'Gender', email:'Email', phone:'Phone', password:'Password', sections:'Sections', user:'User', all:'All', personalOnly:'Personal only', commonOnly:'Shared only', allCategories:'All categories', spendTrend:'Spend trend', selectedRangeSubSingle:'period', selectedRangeSubPlural:'periods', allUsers:'All users', clickAll:'Click to show all', ofTotal:'of total', selectedRangeBlock:'Selected range', calendarMonth:'Calendar month', amexPeriod:'Amex period', calendar:'Calendar', allYears:'All years', fullYear:'Full year', fromPeriod:'From period…', toPeriod:'To period…', topCategories:'Top categories', subscriptions:'Detected subscriptions', distribution:'Distribution', categoryDistribution:'Category distribution', categoryTrend:'Category trend', trendSplit:'Split trend', monthlyTrend:'Monthly trend', categoriesByUser:'Categories by user', userFilteredCategoryTrend:'Category trend · user filter applied', subtotal:'Subtotal for current selection', filteredTransactions:'filtered transactions', newCategory:'＋ New category…', doNotChange:'Do not change', active:'Active', field:'Field', match:'Match', text:'Text', category:'Category', personalFlag:'Personal flag', actions:'Actions', categorizationRules:'Categorization rules', rulesHelp:'Rules are applied to new uploads. You can apply them to any DB field; manual overrides remain the priority.', newRule:'+ New rule', applyRetro:'↩ Apply retroactively', suggestions:'Suggestions from manual overrides', contains:'contains', startsWith:'starts with', equals:'equals', endsWith:'ends with', create:'Create', delete:'Delete', merchantDesc:'Merchant / description', holder:'Holder', country:'Country', min:'Min', max:'Max', subscription:'Subscription', calendarPeriod:'Calendar period', statementPeriod:'Amex period', reference:'Reference', personal:'Personal', common:'Shared', onlyPersonalLower:'personal only', onlyCommonLower:'shared only', allLower:'all', colorTheme:'Color theme for this user', cannotDeleteOther:'Other cannot be deleted', deleteCategory:'Delete category', loginSub:'Login with user and password', initialPassword:'Initial password:', initialPasswordHelp:'You can change it from Profile.', optionalUser:'User (optional on first login)', login:'Log in', show:'Show', hide:'Hide', notSpecified:'Not specified', prefix:'Prefix', phoneNumber:'Number', newPassword:'New password', confirmNewPassword:'Confirm new password', back:'Back', loading:'Loading…', year:'Year', period:'Period', month:'Month', view:'View', amexPeriodEnding:'Amex period ending on the 20th', fullYearPrefix:'Year', date:'Date', description:'Description', amount:'Amount €', flag:'Flag', dismissSuggestion:'Dismiss suggestion', overrideCount:'override', overrideCountPlural:'overrides', readingExcel:'📖 Reading Excel…', updated:'✅ Updated:', fileImportError:'File import error', invalidBackup:'This file does not look like a valid backup', restoreBackupConfirm:'You are about to RESTORE the full database from the JSON backup:', restoreBackupWarning:'This operation overwrites the current KV content. Confirm?', transactions:'transactions', rulesCount:'rules', customCategoriesCount:'custom categories', overridesCount:'overrides', backupImported:'✅ JSON backup imported and saved to KV', backupImportError:'JSON backup import error', invalidEmail:'Invalid email', passwordsDontMatch:'The two passwords do not match', profileUpdated:'✅ User profile updated', deleteCategoryConfirmStart:'Delete category', deleteCategoryConfirmBody:'Transactions, rules and related overrides will be remapped to Other. No transaction or rule will be deleted.', other:'Other', remappedToOther:'remapped to Other', personalizationSaved:'✅ Customization saved', newCategoryPrompt:'New category name', ruleCategoryPrompt:'Target category: enter a name/key, or leave blank to avoid changing category', invalidCategory:'Invalid category. Use an existing category or create it first from the Data tab.', retroApplied:'✅ Rules applied retroactively', included:'included', filteredRows:'filtered rows', filter:'Filter', workspace:'Workspace', accountArea:'Account', users:'Users', userManagement:'User management', addUser:'Add user', role:'Role', admin:'Admin', standardUser:'User', createAdmin:'Create admin account', uploadDatabase:'Upload database', setupTitle:'Set up homefin', setupSubtitle:'Create the first administrator, define your household and choose your starting data. Setup runs once per deployment.', setupDatabaseHelp:'A homefin JSON backup or an Amex Excel statement.', setupReady:'Database ready', createAccount:'Create account', setupDone:'Setup completed', name:'Name', setupPasswordHelp:'At least 8 characters. Stored only as a PBKDF2 hash on the server.', logout:'Logout' }
+  en: { profile:'Profile', personalProfile:'Personal profile', data:'Data', customization:'Customization', saveProfile:'Save profile', saveCustomization:'Save customization', dark:'Dark', light:'Light', overview:'Spending', categories:'Categories', perUser:'By user', rules:'Rules', totalSpend:'Total spend', selectedRange:'Included periods', allHistory:'Full history', goUpload:'No periods loaded yet. Go to Data to upload your history.', sync:'Sync KV', importExcel:'Import Excel', exportJson:'Export JSON', importBackup:'Import Backup', language:'Dashboard language', displayedName:'Display name', username:'Username', gender:'Gender', email:'Email', phone:'Phone', password:'Password', sections:'Sections', user:'User', all:'All', personalOnly:'Personal only', commonOnly:'Shared only', allCategories:'All categories', spendTrend:'Spend trend', selectedRangeSubSingle:'period', selectedRangeSubPlural:'periods', allUsers:'All users', clickAll:'Click to show all', ofTotal:'of total', selectedRangeBlock:'Selected range', calendarMonth:'Calendar month', amexPeriod:'Amex period', calendar:'Calendar', allYears:'All years', fullYear:'Full year', fromPeriod:'From period…', toPeriod:'To period…', topCategories:'Top categories', subscriptions:'Detected subscriptions', distribution:'Distribution', categoryDistribution:'Category distribution', categoryTrend:'Category trend', trendSplit:'Split trend', monthlyTrend:'Monthly trend', categoriesByUser:'Categories by user', userFilteredCategoryTrend:'Category trend · user filter applied', subtotal:'Subtotal for current selection', filteredTransactions:'filtered transactions', newCategory:'＋ New category…', doNotChange:'Do not change', active:'Active', field:'Field', match:'Match', text:'Text', category:'Category', personalFlag:'Personal flag', actions:'Actions', categorizationRules:'Categorization rules', rulesHelp:'Rules are applied to new uploads. You can apply them to any DB field; manual overrides remain the priority.', newRule:'+ New rule', applyRetro:'↩ Apply retroactively', suggestions:'Suggestions from manual overrides', contains:'contains', startsWith:'starts with', equals:'equals', endsWith:'ends with', create:'Create', delete:'Delete', merchantDesc:'Merchant / description', holder:'Holder', country:'Country', min:'Min', max:'Max', subscription:'Subscription', calendarPeriod:'Calendar period', statementPeriod:'Amex period', reference:'Reference', personal:'Personal', common:'Shared', onlyPersonalLower:'personal only', onlyCommonLower:'shared only', allLower:'all', colorTheme:'Color theme for this user', cannotDeleteOther:'Other cannot be deleted', deleteCategory:'Delete category', loginSub:'Login with user and password', initialPassword:'Initial password:', initialPasswordHelp:'You can change it from Profile.', optionalUser:'User (optional on first login)', login:'Log in', show:'Show', hide:'Hide', notSpecified:'Not specified', prefix:'Prefix', phoneNumber:'Number', newPassword:'New password', confirmNewPassword:'Confirm new password', back:'Back', loading:'Loading…', year:'Year', period:'Period', month:'Month', view:'View', amexPeriodEnding:'Amex period ending on the 20th', fullYearPrefix:'Year', date:'Date', description:'Description', amount:'Amount €', flag:'Flag', dismissSuggestion:'Dismiss suggestion', overrideCount:'override', overrideCountPlural:'overrides', readingExcel:'📖 Reading Excel…', updated:'✅ Updated:', fileImportError:'File import error', invalidBackup:'This file does not look like a valid backup', restoreBackupConfirm:'You are about to RESTORE the full database from the JSON backup:', restoreBackupWarning:'This operation overwrites the current KV content. Confirm?', transactions:'transactions', rulesCount:'rules', customCategoriesCount:'custom categories', overridesCount:'overrides', backupImported:'✅ JSON backup imported and saved to KV', backupImportError:'JSON backup import error', invalidEmail:'Invalid email', passwordsDontMatch:'The two passwords do not match', profileUpdated:'✅ User profile updated', deleteCategoryConfirmStart:'Delete category', deleteCategoryConfirmBody:'Transactions, rules and related overrides will be remapped to Other. No transaction or rule will be deleted.', other:'Other', remappedToOther:'remapped to Other', personalizationSaved:'✅ Customization saved', newCategoryPrompt:'New category name', ruleCategoryPrompt:'Target category: enter a name/key, or leave blank to avoid changing category', invalidCategory:'Invalid category. Use an existing category or create it first from the Data tab.', retroApplied:'✅ Rules applied retroactively', included:'included', filteredRows:'filtered rows', filter:'Filter', workspace:'Workspace', accountArea:'Account', users:'Users', userManagement:'User management', addUser:'Add user', role:'Role', admin:'Admin', standardUser:'User', createAdmin:'Create admin account', uploadDatabase:'Upload database', setupTitle:'Set up homefin', setupSubtitle:'Create the first administrator, define your household and choose your starting data. Setup runs once per deployment.', setupDatabaseHelp:'A homefin JSON backup or an Amex Excel statement.', setupReady:'Database ready', createAccount:'Create account', setupDone:'Setup completed', name:'Name', setupPasswordHelp:'At least 8 characters. Stored only as a PBKDF2 hash on the server.', logout:'Logout' }
 };
 const LANGUAGE_OPTIONS = [{key:'en',label:'English'},{key:'it',label:'Italiano'}];
 const EXTRA_I18N = {
@@ -1976,7 +1978,7 @@ Object.assign(EXTRA_I18N.it, {
   previousLabel:'Precedente'
 });
 Object.assign(EXTRA_I18N.en, {
-  overview:'Expense',
+  overview:'Spending',
   income:'Income',
   totalIncome:'Total income',
   incomeMovements:'Movements',
@@ -2103,6 +2105,8 @@ Object.assign(EXTRA_I18N.en, {
   loginHelp:'Accounts are created by an admin in Profile → Users.', changePassword:'Change password',
   healthUnmatchedHolder:'Holders not matched to a member', healthHolderShared:'"Shared" holder on Amex'
 });
+Object.assign(EXTRA_I18N.it, { more:'Altro', vsPrevious:'vs periodo precedente', savingsRate:'Tasso di risparmio', net:'Netto', avgPerPeriod:'Media per periodo', people:'Persone', share:'Quota', monthlySpending:'Spesa mensile', noData:'Nessun dato nel periodo' });
+Object.assign(EXTRA_I18N.en, { more:'More', vsPrevious:'vs previous period', savingsRate:'Savings rate', net:'Net', avgPerPeriod:'Average per period', people:'People', share:'Share', monthlySpending:'Monthly spending', noData:'No data in this range' });
 function tr(lang, key) { return (I18N[lang] && I18N[lang][key]) || (EXTRA_I18N[lang] && EXTRA_I18N[lang][key]) || I18N.en[key] || (EXTRA_I18N.en && EXTRA_I18N.en[key]) || key; }
 const CATEGORY_LABEL_TRANSLATIONS = {
   en: { ristoranti:'Restaurants', supermercato:'Groceries', amazon:'Amazon', salute:'Health', delivery:'Delivery', streaming_tech:'Streaming & Apps', tv:'Sky / TV', hotel:'Hotels', voli:'Flights', trasporti:'Transport', benessere:'Wellness', quota_assoc:'Membership fee', altro:'Other', personale:'Personal', lavoro:'Work', assicurazione_meidca:'Medical insurance', assicurazione_medica:'Medical insurance', spese_terzi:'Third-party expenses', food:'Food', shopping:'Shopping', viaggi:'Travel', assicurazione:'Insurance' }
@@ -2864,6 +2868,7 @@ export default function App() {
   const [quickRange, setQuickRange] = useState('ALL');
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
+  const [showMore, setShowMore] = useState(false);
   const [forecastExpanded, setForecastExpanded] = useState(false);
   const fileRef = useRef();
   const backupRef = useRef();
@@ -3810,6 +3815,26 @@ export default function App() {
       ].slice(-300)
     });
   };
+  const navTabs = [
+    ['overview', T('overview'), 'overview'],
+    ['income', T('income'), 'income'],
+    ['trends', T('trends'), 'trends'],
+    ['raw', T('data'), 'data'],
+    ['notes', T('notesTab'), 'notes'],
+  ];
+  const mobileTabs = navTabs.filter(([id]) => id !== 'notes');
+  const pageTitle = (navTabs.find(([id]) => id === activeTab) || [null, T('profile')])[1];
+  const goTab = (id) => { setShowUserMenu(false); setShowFilters(false); setShowMobileFilters(false); setActiveTab(id); window.scrollTo?.(0, 0); };
+  const toggleThemeMode = () => setThemeMode((prev) => { const next = prev === 'dark' ? 'light' : 'dark'; lsSet(LS.theme, next); return next; });
+  const quickRangeOptions = [
+    ['ALL', T('quickAll'), applyAllPeriods],
+    ['YTD', 'YTD', applyYtd],
+    ['LAST_12', '12M', () => applyLastPeriods(12, 'LAST_12')],
+    ['LAST_6', '6M', () => applyLastPeriods(6, 'LAST_6')],
+    ['LAST_3', '3M', () => applyLastPeriods(3, 'LAST_3')],
+    ['LAST_1', '1M', () => applyLastPeriods(1, 'LAST_1')],
+  ];
+  const activeFilterCount = [personalFlagFilters.length > 0, sourceFilters.length > 0, categoryFilters.length > 0, viewMode === 'calendar', !!(rangeStart || rangeEnd) && quickRange === 'CUSTOM'].filter(Boolean).length;
   const tabs = [
     ['overview', T('overview'), 'overview'],
     ['income', T('income'), 'income'],
@@ -4116,86 +4141,67 @@ export default function App() {
 
   return (
     <>
-    <div className="hf-app" data-theme={theme.name}>
-      
-      <div className="mh hf-header">
-        <div className="mh-main hf-header-main">
-          <div className="mh-left hf-header-left">
-            <div className="mh-brand hf-brand-shell">
-              <BrandLogo compact theme={theme} />
-            </div>
-            <div className="mh-tabs hf-tabs">
-              {tabs.map(([id, label, icon]) => {
-                const active = activeTab === id;
-                return <button key={id} className={`hf-tab ${active ? 'is-active' : ''}`} data-tab-id={id} onClick={() => { setShowUserMenu(false); setActiveTab(id); }}><Icon name={icon} /><span>{label}</span></button>;
-              })}
-            </div>
-          </div>
-          <div className="mh-actions hf-actions">
-            <div className="hf-header-filter-actions">
-              <button className={`hf-icon-button ${showFilters ? 'is-active' : ''}`} onClick={() => { setShowFilters(v=>!v); setShowMobileFilters(true); }} title={T('filters')} aria-label={T('filters')}><Icon name="filters" /></button>
-              <button className="hf-icon-button" onClick={resetAllFilters} title={T('resetAllFiltersLong')} aria-label={T('resetAllFiltersLong')}><Icon name="reset" /></button>
-            </div>
-            <button className="hf-icon-button" onClick={() => setThemeMode((prev) => { const next = prev === 'dark' ? 'light' : 'dark'; lsSet(LS.theme, next); return next; })} title={themeMode === 'dark' ? T('light') : T('dark')} aria-label={themeMode === 'dark' ? T('light') : T('dark')}>
-              <Icon name="theme" />
-            </button>
-            <button className="hf-icon-button" onClick={() => setCurrentLanguage(currentLang === 'en' ? 'it' : 'en')} title={T('language')} aria-label={T('language')}>
-              <Icon name="language" />
-            </button>
-            <button className="hf-icon-button" onClick={logout} title={T('logout')} aria-label={T('logout')}>
-              <Icon name="logout" />
-            </button>
-            <input ref={fileRef} className="hf-file-input" type="file" accept=".xlsx,.xls,.csv,text/csv" multiple onChange={handleUpload} />
-            <input ref={backupRef} className="hf-file-input" type="file" accept="application/json,.json" onChange={handleBackupImport} />
+    <div className="hf-app hfx" data-theme={theme.name}>
+      <aside className="hfx-sidebar" aria-label={T('sections')}>
+        <div className="hfx-brand"><img src="/logo.png" alt="" className="hfx-logo" /><span>homefin</span></div>
+        <nav className="hfx-nav">
+          {navTabs.map(([id, label, icon]) => <button key={id} type="button" className={`hfx-nav-item ${activeTab === id ? 'is-active' : ''}`} aria-current={activeTab === id ? 'page' : undefined} data-tab-id={id} onClick={() => goTab(id)}><Icon name={icon} size={16} /><span>{label}</span></button>)}
+        </nav>
+        <div className="hfx-side-group">
+          <div className="hfx-side-label">{T('household')}</div>
+          {members.map((m, idx) => <button key={m.id} type="button" className={`hfx-member ${selectedHolder === m.id ? 'is-active' : ''}`} onClick={() => setSelectedHolder(selectedHolder === m.id ? 'ALL' : m.id)}><span className="hfx-dot" style={{ background: memberColor(theme, idx) }} />{m.name}</button>)}
+        </div>
+        <div className="hfx-side-foot">
+          <button type="button" className={`hfx-nav-item ${activeTab === 'profile' ? 'is-active' : ''}`} data-tab-id="profile" onClick={() => goTab('profile')}><Icon name="customization" size={16} /><span>{T('profile')}</span></button>
+          <div className="hfx-user">
+            <span className="hfx-avatar" aria-hidden="true">{initials(currentUser.name || currentUserId)}</span>
+            <span className="hfx-user-name">{currentUser.name || currentUserId}</span>
+            <button type="button" className="hfx-icon-btn" onClick={toggleThemeMode} title={themeMode === 'dark' ? T('light') : T('dark')} aria-label={themeMode === 'dark' ? T('light') : T('dark')}><Icon name="theme" size={15} /></button>
+            <button type="button" className="hfx-icon-btn" onClick={() => setCurrentLanguage(currentLang === 'en' ? 'it' : 'en')} title={T('language')} aria-label={T('language')}><span className="hfx-lang">{currentLang.toUpperCase()}</span></button>
+            <button type="button" className="hfx-icon-btn" onClick={logout} title={T('logout')} aria-label={T('logout')}><Icon name="logout" size={15} /></button>
           </div>
         </div>
+        <input ref={fileRef} className="hf-file-input" type="file" accept=".xlsx,.xls,.csv,text/csv" multiple onChange={handleUpload} />
+        <input ref={backupRef} className="hf-file-input" type="file" accept="application/json,.json" onChange={handleBackupImport} />
+      </aside>
 
-        <div style={{ display:'none', gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))', gap:10, marginBottom:16 }}>
-          <div>
-            <div style={{ fontSize:11, color: theme.subtext, marginBottom:6, fontWeight:700 }}>{T('view')}</div>
-            <div style={{ ...S.input, display:'flex', alignItems:'center', minHeight: 42 }}>{viewMode === 'calendar' ? T('calendarMonth') : T('amexPeriodEnding')}</div>
+      <div className="hfx-main">
+        <header className="hfx-topbar">
+          <div className="hfx-title">
+            <img src="/logo.png" alt="" className="hfx-logo hfx-mobile-only" />
+            <h1>{pageTitle}</h1>
+            {activeTab !== 'profile' && <span className="hfx-range">{rangeLabel}</span>}
           </div>
-          <div>
-            <div style={{ fontSize:11, color: theme.subtext, marginBottom:6, fontWeight:700 }}>{T('year')}</div>
-            <select value={selectedYear} onChange={(e) => { setSelectedYear(e.target.value); setSelectedPeriod('ALL'); }} style={S.input}>
-              <option value="ALL">{T('allYears')}</option>
-              {availableYears.map((year) => <option key={year} value={year}>{year}</option>)}
-            </select>
-          </div>
-          <div style={{ gridColumn:'span 2' }}>
-            <div style={{ fontSize:11, color: theme.subtext, marginBottom:6, fontWeight:700 }}>{viewMode === 'calendar' ? T('month') : T('period')}</div>
-            <select value={selectedPeriod} onChange={(e) => setSelectedPeriod(e.target.value)} style={S.input}>
-              <option value="ALL">{selectedYear === 'ALL' ? T('allHistory') : `${T('fullYear')} ${selectedYear}`}</option>
-              {periodsForYear.map((key) => <option key={key} value={key}>{periodLabel(key, viewMode, currentLang)}</option>)}
-            </select>
-          </div>
-        </div>
+          {activeTab !== 'profile' && <div className="hfx-toolbar">
+            <div className="hfx-seg hfx-desktop-only" role="group" aria-label={T('user')}>
+              <button type="button" className={selectedHolder === 'ALL' ? 'is-active' : ''} aria-pressed={selectedHolder === 'ALL'} onClick={() => setSelectedHolder('ALL')}>{T('all')}</button>
+              {members.map((m, idx) => <button key={m.id} type="button" className={selectedHolder === m.id ? 'is-active' : ''} aria-pressed={selectedHolder === m.id} onClick={() => setSelectedHolder(m.id)}><span className="hfx-dot" style={{ background: memberColor(theme, idx) }} />{m.name}</button>)}
+            </div>
+            <div className="hfx-seg hfx-desktop-only" role="group" aria-label={T('quickRange')}>
+              {quickRangeOptions.map(([key, label, fn]) => { const disabled = activeTab === 'trends' && key === 'ALL'; return <button key={key} type="button" className={quickRange === key ? 'is-active' : ''} aria-pressed={quickRange === key} disabled={disabled} onClick={disabled ? undefined : fn}>{label}</button>; })}
+            </div>
+            <button type="button" className={`hfx-btn ${showFilters ? 'is-active' : ''}`} onClick={() => { setShowFilters((v) => !v); setShowMobileFilters(true); }} aria-expanded={showFilters}><Icon name="filters" size={15} /><span>{T('filters')}</span>{activeFilterCount > 0 && <span className="hfx-badge">{activeFilterCount}</span>}</button>
+          </div>}
+        </header>
 
-        {uploadMsg && <div className="hf-toast"><span>{uploadMsg}</span><button onClick={()=>setUploadMsg('')} aria-label="Dismiss" style={{background:'transparent',border:'none',color:theme.text,fontWeight:900,cursor:'pointer',fontSize:16,lineHeight:1}}>×</button></div>}
-      </div>
+        {uploadMsg && <div className="hf-toast" role="status"><span>{uploadMsg}</span><button onClick={()=>setUploadMsg('')} aria-label="Dismiss" className="hfx-toast-close">×</button></div>}
 
       {showUserMenu ? <UserMenuModal store={store} currentUserId={currentUserId} theme={theme} lang={currentLang} onClose={() => setShowUserMenu(false)} onSave={saveUserProfile} inputStyle={S.input} onRefresh={refresh} syncing={syncing} onImportExcel={() => fileRef.current?.click()} uploading={uploading} onExportData={exportData} onImportBackup={() => backupRef.current?.click()} importSourceId={importSourceId} onImportSourceChange={(id)=>{ setImportSourceId(id); lsSet(LS.importSource, id); }} importAccountId={importAccountId} onImportAccountChange={(id)=>{ setImportAccountId(id); lsSet(LS.importAccount, id); }} onSaveHousehold={saveHousehold} onSaveFormat={saveCustomFormat} onDeleteFormat={deleteCustomFormat} onSaveFormatAndImport={saveFormatAndImport} onSavePersonalization={savePersonalization} onDeleteCategory={deleteCategorySafe} onSaveUsers={saveUsers} onLogout={logout} onOpenRawData={(filters)=>{ setShowUserMenu(false); filters ? openDataWithFilters(filters) : setActiveTab('raw'); }} onSaveStore={saveStore} onTimeMachineRestored={(next)=>setStore(next)} onApplyRulesRetroactively={applyRetro} /> : <div className="mc hf-content">
         {activeTab !== 'profile' && <>
-        <div className="msummarybar" style={{ display:'none' }} />
-        <div className="mstats hf-stat-grid">
-          <StatCard className="mrange-card" theme={theme} title={T('selectedRange')} value={rangeLabel} sub={`${aggregateKeys.length} ${aggregateKeys.length === 1 ? T('selectedRangeSubSingle') : T('selectedRangeSubPlural')}`} accent={theme.text} />
-          {activeTab === 'income'
-            ? <>
-                <StatCard theme={theme} title={T('totalIncome')} value={fmtDec(incomeModel.total)} sub={selectedHolder==='ALL'?T('allUsers'):T('clickAll')} accent={theme.totalGreen || theme.accent} active={selectedHolder==='ALL'} onClick={()=>setSelectedHolder('ALL')} />
-                {incomeUserCards.map((u, idx) => <StatCard key={u.id} theme={theme} title={u.name} value={fmtDec(u.value)} sub={`${incomeModel.total ? Math.round(u.value / incomeModel.total * 100) : 0}% ${T('ofTotal')}`} accent={userAccentFor(u.id, idx)} active={selectedHolder===u.id} onClick={()=>setSelectedHolder(u.id)} />)}
-              </>
-            : <>
-                <StatCard theme={theme} title={T('totalSpend')} value={fmt(allCur.total)} sub={selectedHolder==='ALL'?T('allUsers'):T('clickAll')} accent={theme.totalGreen || theme.accent} active={selectedHolder==='ALL'} onClick={()=>setSelectedHolder('ALL')} />
-                {userCards.map((u, idx) => <StatCard key={u.id} theme={theme} title={u.name} value={fmt(u.value)} sub={`${allCur.total ? Math.round(u.value / allCur.total * 100) : 0}% ${T('ofTotal')} · ${personalFilterLabel}`} accent={userAccentFor(u.id, idx)} active={selectedHolder===u.id} onClick={()=>setSelectedHolder(u.id)} />)}
-              </>}
-        </div>
+        {activeTab !== 'overview' && <div className="hfx-strip">
+          {(activeTab === 'income'
+            ? [{ id: 'ALL', label: T('totalIncome'), value: fmtDec(incomeModel.total) }, ...incomeUserCards.map((u) => ({ id: u.id, label: u.name, value: fmtDec(u.value), share: incomeModel.total ? Math.round(u.value / incomeModel.total * 100) : 0 }))]
+            : [{ id: 'ALL', label: T('totalSpend'), value: fmt(allCur.total) }, ...userCards.map((u) => ({ id: u.id, label: u.name, value: fmt(u.value), share: allCur.total ? Math.round(u.value / allCur.total * 100) : 0 }))]
+          ).map((item, idx) => <button key={item.id} type="button" className={`hfx-strip-item ${selectedHolder === item.id ? 'is-active' : ''}`} onClick={() => setSelectedHolder(item.id)}>
+            <span className="hfx-strip-label">{idx > 0 && <span className="hfx-dot" style={{ background: memberColor(theme, idx - 1) }} />}{item.label}</span>
+            <span className="hfx-strip-value">{item.value}</span>
+            {item.share != null && <span className="hfx-strip-sub">{item.share}%</span>}
+          </button>)}
+        </div>}
 
-        <div className="floating-actions" style={{ display:'none' }}>
-          <button className={`floating-action-btn ${showFilters ? 'is-active' : ''}`} onClick={() => { setShowFilters(v=>!v); setShowMobileFilters(true); }} title={T('filters')} aria-label={T('filters')}><Icon name="filters" size={22} /></button>
-          <button className="floating-action-btn" onClick={resetAllFilters} title={T('resetAllFiltersLong')} aria-label={T('resetAllFiltersLong')}><Icon name="reset" size={22} /></button>
-        </div>
-
-        <div className={`mfilters hf-filter-panel ${showMobileFilters ? 'mobile-open' : ''} ${showFilters ? '' : 'is-hidden'}`} data-filter-title={T('filters')}>
+        {showFilters && <div className="hfx-scrim" onClick={() => { setShowFilters(false); setShowMobileFilters(false); }} />}
+        <div className={`mfilters hf-filter-panel hfx-filters ${showMobileFilters ? 'mobile-open' : ''} ${showFilters ? '' : 'is-hidden'}`} data-filter-title={T('filters')} role="dialog" aria-label={T('filters')}>
+          <div className="hfx-filters-head"><b>{T('filters')}</b><div><button type="button" className="hfx-link" onClick={resetAllFilters}>{T('resetFilters')}</button><button type="button" className="hfx-icon-btn" aria-label="Close" onClick={() => { setShowFilters(false); setShowMobileFilters(false); }}>×</button></div></div>
           <button className="mfilter-close" onClick={() => { setShowMobileFilters(false); setShowFilters(false); }} style={{ display:'none', background:theme.input, border:'1px solid '+theme.border, color:theme.text, cursor:'pointer' }}>×</button>
           <div className="mfilter-grid hf-filter-grid">
             <div className="mfilter-section hf-filter-section">
@@ -4267,91 +4273,106 @@ export default function App() {
 
         {activeTab === 'profile' && <UserMenuModal store={store} currentUserId={currentUserId} theme={theme} lang={currentLang} onClose={() => setActiveTab('overview')} embedded={true} onSave={saveUserProfile} inputStyle={S.input} onRefresh={refresh} syncing={syncing} onImportExcel={() => fileRef.current?.click()} uploading={uploading} onExportData={exportData} onImportBackup={() => backupRef.current?.click()} importSourceId={importSourceId} onImportSourceChange={(id)=>{ setImportSourceId(id); lsSet(LS.importSource, id); }} importAccountId={importAccountId} onImportAccountChange={(id)=>{ setImportAccountId(id); lsSet(LS.importAccount, id); }} onSaveHousehold={saveHousehold} onSaveFormat={saveCustomFormat} onDeleteFormat={deleteCustomFormat} onSaveFormatAndImport={saveFormatAndImport} onSavePersonalization={savePersonalization} onDeleteCategory={deleteCategorySafe} onSaveUsers={saveUsers} onLogout={logout} onOpenRawData={(filters)=>{ setShowUserMenu(false); filters ? openDataWithFilters(filters) : setActiveTab('raw'); }} onSaveStore={saveStore} onTimeMachineRestored={(next)=>setStore(next)} onApplyRulesRetroactively={applyRetro} />}
 
-        {activeTab === 'overview' && <>
-          <div className="mstack hf-dashboard-grid is-overview-hero">
-            <div className="hf-card hf-hero-card">
-              <div>
-                <div className="hf-card-head">
-                  <div>
-                    <div className="hf-kicker">{T('executiveOverview')}</div>
-                    <div className="hf-kpi-value">{fmtDec(cur.total)}</div>
-                    <div className="hf-muted-line">{rangeLabel} · {aggregateKeys.length} {aggregateKeys.length === 1 ? T('selectedRangeSubSingle') : T('selectedRangeSubPlural')} · {sourceFilterLabel} · {categoryFilterLabel}</div>
-                  </div>
-                  <button className="hf-button-secondary" onClick={() => setActiveTab('trends')}>{T('openTrends')} →</button>
-                </div>
-                <div className="hf-mini-grid">
-                  {overviewExecutiveNotes.map((note, idx)=><div key={idx} className="hf-mini-card">{note}</div>)}
-                </div>
+        {activeTab === 'overview' && <div className="hfx-page">
+          {!periods.length ? <section className="hfx-panel hfx-empty">
+            <h2>{T('noData')}</h2>
+            <p>{T('goUpload')}</p>
+            <button type="button" className="hfx-btn is-primary" onClick={() => goTab('profile')}>{T('importExcel')}</button>
+          </section> : <>
+          <section className="hfx-hero">
+            <div className="hfx-hero-main">
+              <div className="hfx-eyebrow">{T('totalSpend')}</div>
+              <div className="hfx-hero-value hfx-num">{fmtDec(cur.total)}</div>
+              <div className="hfx-hero-meta">
+                {cfoTrendModel.previousKeys.length
+                  ? <><span className={`hfx-delta ${cfoTrendModel.delta > 0 ? 'is-up' : 'is-down'}`}>{formatDeltaText(cfoTrendModel.delta, cfoTrendModel.pct, fmtDec)}</span><span>{T('vsPrevious')}</span></>
+                  : <span>{T('notEnoughHistory')}</span>}
+                <span className="hfx-sep" aria-hidden="true" />
+                <span>{T('shared')} <b className="hfx-num">{fmtDec(overviewSharedTotal)}</b></span>
+                <span>{T('personalLabel')} <b className="hfx-num">{fmtDec(overviewPersonalTotal)}</b></span>
               </div>
-              <ResponsiveContainer width="100%" height={210}>
-                <LineChart data={trendData} margin={{top:5,right:8,left:-14,bottom:5}}>
-                  <CartesianGrid strokeDasharray="3 3" stroke={theme.border} />
-                  <XAxis dataKey="month" tick={{fill:theme.subtext,fontSize:11}} />
-                  <YAxis tick={{fill:theme.subtext,fontSize:11}} tickFormatter={amountTick} />
-                  <Tooltip formatter={(v)=>fmt(v)} contentStyle={chartTooltipStyle} labelStyle={{ color: theme.text }} itemStyle={{ color: theme.text }} />
-                  <Line type="monotone" dataKey={trendLineKey} stroke={theme.totalGreen || theme.accent} strokeWidth={3} dot={{ r:3 }} />
-                  {members.map((m, idx) => <Line key={m.id} type="monotone" dataKey={m.name} stroke={memberColor(theme, idx)} strokeWidth={2} dot={false} />)}
-                </LineChart>
-              </ResponsiveContainer>
             </div>
-            <div className="hf-card">
-              <div className="hf-card-title">{T('peopleSplit')}</div>
-              {overviewUserRows.map((row)=>{ const pct = cur.total ? Math.round(row.value / cur.total * 100) : 0; const sharedPct = row.value ? Math.round(row.shared / row.value * 100) : 0; const personalPct = row.value ? Math.round(row.personal / row.value * 100) : 0; const sharedCats = row.sharedCategories.map(c=>`${c.icon} ${c.label} ${fmtDec(c.value)}`).join(' · ') || '—'; const personalCats = row.personalCategories.map(c=>`${c.icon} ${c.label} ${fmtDec(c.value)}`).join(' · ') || '—'; return <div key={row.key} className="hf-progress-row hf-people-split-row"><div className="hf-progress-head"><b>{row.label}</b><b>{fmtDec(row.value)} <span className="hf-data-muted">({pct}%)</span></b></div><div className="hf-people-bars"><div><div className="hf-mini-bar-label"><span>{T('shared')}</span><span>{fmtDec(row.shared)}</span></div><div className="hf-progress-track"><div className="hf-progress-bar" style={{width:`${Math.min(100,sharedPct)}%`,background:row.color,opacity:0.72}} /></div></div><div><div className="hf-mini-bar-label"><span>{T('personalLabel')}</span><span>{fmtDec(row.personal)}</span></div><div className="hf-progress-track"><div className="hf-progress-bar" style={{width:`${Math.min(100,personalPct)}%`,background:row.color}} /></div></div><div className="hf-people-category-line"><b>{T('shared')}</b><span>{sharedCats}</span></div><div className="hf-people-category-line"><b>{T('personalLabel')}</b><span>{personalCats}</span></div></div></div>; })}
-              <div className="hf-card-note">{T('sharedAllocationNote')}</div>
-            </div>
-          </div>
+            <dl className="hfx-kpis">
+              <div><dt>{T('income')}</dt><dd className="hfx-num">{fmtDec(cashflowTrendModel.current.income || 0)}</dd></div>
+              <div><dt>{T('net')}</dt><dd className={`hfx-num ${(cashflowTrendModel.current.net || 0) >= 0 ? 'is-pos' : 'is-neg'}`}>{fmtDec(cashflowTrendModel.current.net || 0)}</dd></div>
+              <div><dt>{T('savingsRate')}</dt><dd className="hfx-num">{cashflowTrendModel.current.income ? `${Math.round((cashflowTrendModel.current.net || 0) / cashflowTrendModel.current.income * 100)}%` : '—'}</dd></div>
+              <div><dt>{T('avgPerPeriod')}</dt><dd className="hfx-num">{fmtDec(overviewAvgPerPeriod)}</dd></div>
+            </dl>
+          </section>
 
-          <div className="mstack hf-dashboard-grid is-balanced">
-            <div className="hf-card">
-              <div className="hf-section-head"><div className="hf-card-title">{T('topCategories')}</div><select value={categoryLimit} onChange={(e)=>setCategoryLimit(e.target.value)} style={{...S.input,maxWidth:120}}>{[5,10,15,25,50].map(n=><option key={n} value={n}>Top {n}</option>)}</select></div>
-              {topCategoryRows.map(([k,v]) => {
-                const cfg = categoryConfig[k] || {label:k,icon:'📋',color:'#888'};
-                const pct = cur.total ? Math.round(v/cur.total*100) : 0;
-                return (
-                  <button key={k} className="hf-progress-row hf-clickable-row" onClick={()=>openDataWithFilters({ category:k })}>
-                    <div className="hf-progress-head">
-                      <span>{cfg.icon} {cfg.label}</span>
-                      <span className="hf-data-strong">{fmt(v)} <span className="hf-data-muted">({pct}%)</span></span>
-                    </div>
-                    <div className="hf-progress-track"><div className="hf-progress-bar" style={{ width:`${pct}%`, background:cfg.color }} /></div>
-                  </button>
-                );
-              })}
-            </div>
-            <div className="hf-card">
-              <div className="hf-card-title">{T('byAccountSource')}</div>
-              {overviewAccountRows.length ? overviewAccountRows.map(([name,value])=>{ const pct = cur.total ? Math.round(value / cur.total * 100) : 0; return <button key={name} className="hf-list-row hf-clickable-row" onClick={()=>openDataWithFilters({ source:name })}><div className="hf-list-row-head"><span className="hf-data-strong">{name}</span><b>{fmtDec(value)}</b></div><div className="hf-bar-row"><div className="hf-progress-track" style={{flex:1,height:6}}><div className="hf-progress-bar" style={{width:`${Math.min(100,pct)}%`,background:theme.accent}} /></div><span className="hf-small-pct">{pct}%</span></div></button>; }) : <div className="hf-empty-text">{T('noDataInRange')}</div>}
-            </div>
-          </div>
-
-          <div className="mstack hf-dashboard-grid is-balanced" style={{ gridTemplateColumns: totalSubs ? undefined : '1fr' }}>
-            <div className="hf-card">
-              <div className="hf-card-title">{T('distribution')}</div>
-              <div className="hf-pie-wrap">
-                <ResponsiveContainer width="100%" height={230}>
-                  <PieChart>
-                    <Pie data={catPieData} cx="50%" cy="50%" innerRadius={58} outerRadius={90} paddingAngle={2} dataKey="value">
-                      {catPieData.map((e,i) => <Cell key={i} fill={e.color} />)}
-                    </Pie>
-                    <Tooltip formatter={(v)=>fmt(v)} contentStyle={chartTooltipStyle} labelStyle={{ color: theme.text }} itemStyle={{ color: theme.text }} />
-                  </PieChart>
+          <div className="hfx-grid hfx-grid-main">
+            <section className="hfx-panel">
+              <header className="hfx-panel-head">
+                <h2>{T('monthlySpending')}</h2>
+                <div className="hfx-legend">{members.map((m, idx) => <span key={m.id}><span className="hfx-dot" style={{ background: memberColor(theme, idx) }} />{m.name}</span>)}</div>
+              </header>
+              <div className="hfx-chart">
+                <ResponsiveContainer width="100%" height={260}>
+                  <BarChart data={trendData} margin={{ top: 8, right: 4, left: 0, bottom: 0 }} barCategoryGap="28%">
+                    <CartesianGrid vertical={false} stroke={theme.border} />
+                    <XAxis dataKey="month" tickLine={false} axisLine={false} tick={{ fill: theme.subtext, fontSize: 11 }} />
+                    <YAxis width={56} tickLine={false} axisLine={false} tick={{ fill: theme.subtext, fontSize: 11 }} tickFormatter={amountTick} />
+                    <Tooltip cursor={{ fill: theme.chipBg }} formatter={(v) => fmt(v)} contentStyle={chartTooltipStyle} labelStyle={{ color: theme.text }} itemStyle={{ color: theme.text }} />
+                    {members.map((m, idx) => <Bar key={m.id} dataKey={m.name} stackId="people" fill={memberColor(theme, idx)} radius={idx === members.length - 1 ? [3, 3, 0, 0] : 0} isAnimationActive={false} />)}
+                  </BarChart>
                 </ResponsiveContainer>
-                <div className="hf-pie-total"><span>{T('totalSpend')}</span><b>{fmtDec(cur.total || 0)}</b></div>
               </div>
-              <div className="hf-legend">
-                {catPieData.slice(0,10).map(d => <button key={d.name} className="hf-legend-item hf-legend-button" onClick={()=>openDataWithFilters({ category:d.key })}><div className="hf-legend-swatch" style={{background:d.color}} /><span>{d.icon} {d.name}</span></button>)}
+            </section>
+
+            <section className="hfx-panel">
+              <header className="hfx-panel-head"><h2>{T('people')}</h2></header>
+              <div className="hfx-people">
+                {overviewUserRows.map((row) => { const pct = cur.total ? Math.round(row.value / cur.total * 100) : 0; const sharedPct = row.value ? (row.shared / row.value) * 100 : 0; return <button key={row.key} type="button" className={`hfx-person ${selectedHolder === row.key ? 'is-active' : ''}`} onClick={() => setSelectedHolder(selectedHolder === row.key ? 'ALL' : row.key)}>
+                  <div className="hfx-person-head"><span><span className="hfx-dot" style={{ background: row.color }} />{row.label}</span><span className="hfx-num">{fmtDec(row.value)} <em>{pct}%</em></span></div>
+                  <div className="hfx-split" aria-hidden="true"><i style={{ width: `${sharedPct}%`, background: row.color }} /><i style={{ width: `${100 - sharedPct}%`, background: row.color, opacity: 0.4 }} /></div>
+                  <div className="hfx-person-meta"><span>{T('shared')} <b className="hfx-num">{fmtDec(row.shared)}</b></span><span>{T('personalLabel')} <b className="hfx-num">{fmtDec(row.personal)}</b></span></div>
+                </button>; })}
               </div>
-            </div>
-            {totalSubs ? <div className="hf-card">
-              <div className="hf-card-title">{T('subscriptions')}</div>
-              <div className="hf-kpi-value">{fmtDec(totalSubs)}</div>
-              {Object.entries(cur.subs||{}).sort(([,a],[,b])=>b.total-a.total).slice(0,6).map(([name,info]) => {
-                const c = SUB_COLORS[name] || theme.accent;
-                return <button key={name} className="hf-list-row hf-clickable-row" onClick={()=>openDataWithFilters({ subscription:name })}><div className="hf-list-row-head"><span>{name}</span><b style={{color:c}}>{fmtDec(info.total)}</b></div></button>;
-              })}
-            </div> : null}
+              <p className="hfx-footnote">{T('sharedAllocationNote')}</p>
+            </section>
           </div>
-        </>}
+
+          <div className="hfx-grid hfx-grid-split">
+            <section className="hfx-panel">
+              <header className="hfx-panel-head">
+                <h2>{T('categories')}</h2>
+                <select className="hfx-select" value={categoryLimit} onChange={(e)=>setCategoryLimit(e.target.value)} aria-label={T('topCategories')}>{[5,10,15,25,50].map((n)=><option key={n} value={n}>Top {n}</option>)}</select>
+              </header>
+              <ol className="hfx-rank">
+                {topCategoryRows.map(([k, v]) => { const cfg = categoryConfig[k] || { label: k, color: '#888' }; const pct = cur.total ? Math.round(v / cur.total * 100) : 0; return <li key={k}><button type="button" onClick={() => openDataWithFilters({ category: k })}>
+                  <span className="hfx-rank-name"><span className="hfx-dot" style={{ background: cfg.color }} />{cfg.label}</span>
+                  <span className="hfx-rank-bar" aria-hidden="true"><i style={{ width: `${Math.max(pct, 1)}%`, background: cfg.color }} /></span>
+                  <span className="hfx-num hfx-rank-value">{fmtDec(v)}</span>
+                  <span className="hfx-num hfx-rank-pct">{pct}%</span>
+                </button></li>; })}
+              </ol>
+            </section>
+
+            <div className="hfx-stack">
+              <section className="hfx-panel">
+                <header className="hfx-panel-head"><h2>{T('byAccountSource')}</h2></header>
+                {overviewAccountRows.length ? <ol className="hfx-rank is-compact">
+                  {overviewAccountRows.map(([name, value]) => { const pct = cur.total ? Math.round(value / cur.total * 100) : 0; return <li key={name}><button type="button" onClick={() => openDataWithFilters({ source: name })}>
+                    <span className="hfx-rank-name">{name}</span>
+                    <span className="hfx-num hfx-rank-value">{fmtDec(value)}</span>
+                    <span className="hfx-num hfx-rank-pct">{pct}%</span>
+                  </button></li>; })}
+                </ol> : <p className="hfx-footnote">{T('noDataInRange')}</p>}
+              </section>
+              {totalSubs > 0 && <section className="hfx-panel">
+                <header className="hfx-panel-head"><h2>{T('subscriptions')}</h2><span className="hfx-num hfx-muted">{fmtDec(totalSubs)}</span></header>
+                <ol className="hfx-rank is-compact">
+                  {Object.entries(cur.subs || {}).sort(([, a], [, b]) => b.total - a.total).slice(0, 8).map(([name, info]) => <li key={name}><button type="button" onClick={() => openDataWithFilters({ subscription: name })}>
+                    <span className="hfx-rank-name">{name}</span>
+                    <span className="hfx-muted hfx-rank-pct">×{info.count}</span>
+                    <span className="hfx-num hfx-rank-value">{fmtDec(info.total)}</span>
+                  </button></li>)}
+                </ol>
+              </section>}
+            </div>
+          </div>
+          </>}
+        </div>}
 
         {activeTab === 'income' && <>
           <div className="mstack hf-dashboard-grid is-balanced">
@@ -4585,6 +4606,29 @@ export default function App() {
         </div>}
 
       </div>}
+      </div>
+
+      <nav className="hfx-tabbar" aria-label={T('sections')}>
+        {mobileTabs.map(([id, label, icon]) => <button key={id} type="button" className={activeTab === id ? 'is-active' : ''} aria-current={activeTab === id ? 'page' : undefined} onClick={() => goTab(id)}><Icon name={icon} size={20} /><span>{label}</span></button>)}
+        <button type="button" className={showMore || ['notes','profile'].includes(activeTab) ? 'is-active' : ''} onClick={() => setShowMore(true)}><Icon name="more" size={20} /><span>{T('more')}</span></button>
+      </nav>
+      {showMore && <>
+        <div className="hfx-scrim is-mobile" onClick={() => setShowMore(false)} />
+        <div className="hfx-sheet" role="dialog" aria-label={T('more')}>
+          <div className="hfx-sheet-grip" />
+          {[['notes', T('notesTab'), 'notes'], ['profile', T('profile'), 'customization']].map(([id, label, icon]) => <button key={id} type="button" className="hfx-sheet-item" onClick={() => { goTab(id); setShowMore(false); }}><Icon name={icon} size={18} /><span>{label}</span></button>)}
+          <div className="hfx-sheet-sep" />
+          <div className="hfx-sheet-label">{T('user')}</div>
+          <div className="hfx-seg hfx-seg-full" role="group">
+            <button type="button" className={selectedHolder === 'ALL' ? 'is-active' : ''} onClick={() => setSelectedHolder('ALL')}>{T('all')}</button>
+            {members.map((m, idx) => <button key={m.id} type="button" className={selectedHolder === m.id ? 'is-active' : ''} onClick={() => setSelectedHolder(m.id)}><span className="hfx-dot" style={{ background: memberColor(theme, idx) }} />{m.name}</button>)}
+          </div>
+          <div className="hfx-sheet-sep" />
+          <button type="button" className="hfx-sheet-item" onClick={toggleThemeMode}><Icon name="theme" size={18} /><span>{themeMode === 'dark' ? T('light') : T('dark')}</span></button>
+          <button type="button" className="hfx-sheet-item" onClick={() => setCurrentLanguage(currentLang === 'en' ? 'it' : 'en')}><Icon name="language" size={18} /><span>{currentLang === 'en' ? 'Italiano' : 'English'}</span></button>
+          <button type="button" className="hfx-sheet-item is-danger" onClick={logout}><Icon name="logout" size={18} /><span>{T('logout')}</span></button>
+        </div>
+      </>}
     </div>
     </>
   );
