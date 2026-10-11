@@ -5,7 +5,7 @@ import { parseAmexMonthlyWorkbook } from "./importers/amexImporter";
 import { parseRevolutCsvFiles } from "./importers/revolutImporter";
 import { parseMpWorkbook } from "./importers/mpImporter";
 import { parseFinecoWorkbook } from "./importers/finecoImporter";
-import { readCustomImportFiles, parseWithFormat, findMatchingFormat, upgradeLegacyFormat } from "./importers/customImporter";
+import { readCustomImportFiles, parseWithFormat, findMatchingFormat, upgradeLegacyFormat, legacyCustomSourceId } from "./importers/customImporter";
 import LearnFormatPanel from "./LearnFormatPanel.jsx";
 import { buildDemoStore } from "./demoData";
 
@@ -199,6 +199,8 @@ function isCustomSource(value) { return /^custom_[a-z0-9_]+$/.test(String(value 
 function normalizeSource(value) {
   const rawValue = String(value || '').trim();
   if (isCustomSource(rawValue)) return rawValue;
+  const legacyCustom = legacyCustomSourceId(rawValue);
+  if (legacyCustom) return legacyCustom;
   const raw = normalizeText(rawValue || 'amex');
   if (raw.includes('revolut')) return 'revolut';
   if (raw.includes('mediobanca') || raw === 'mp' || raw.includes('premier')) return 'mp';

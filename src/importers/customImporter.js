@@ -722,6 +722,14 @@ export function previewRows(analysis, format, ctx = {}, limit = 12) {
   return { rows: out, ok, skipped, total: analysis.dataRows.length };
 }
 
+/** Maps ids from the first implementation (e.g. "custom_my-bank") to the current form ("custom_my_bank"). */
+export function legacyCustomSourceId(id) {
+  const raw = String(id || "").trim();
+  if (!/^custom_/i.test(raw)) return "";
+  const rest = raw.slice(7).toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "");
+  return rest ? `custom_${rest}` : "";
+}
+
 /** Upgrades formats saved by the first "Learn format" implementation (column mapping only). */
 export function upgradeLegacyFormat(format) {
   if (!format || format.version === CUSTOM_FORMAT_VERSION) return format;
@@ -729,7 +737,7 @@ export function upgradeLegacyFormat(format) {
   const headers = [...new Set(Object.values(old).filter((v) => typeof v === "string" && v))];
   return {
     ...format,
-    id: /^custom_[a-z0-9_]+$/.test(format.id || "") ? format.id : `custom_${slugify(format.label || format.id)}`,
+    id: legacyCustomSourceId(format.id) || `custom_${slugify(format.label || format.id)}`,
     version: CUSTOM_FORMAT_VERSION,
     headers,
     headerSignature: headerSignature(headers),
