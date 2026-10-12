@@ -32,7 +32,7 @@ const PALETTE = ["#FF6B6B","#4ECDC4","#FF9F43","#A29BFE","#FD79A8","#6C5CE7","#0
 const RAW_BASE_RENDER_LIMIT = 100;
 const RAW_FILTER_RENDER_STEP = 100;
 const RAW_FILTER_DEBOUNCE_MS = 200;
-const RAW_VIRTUAL_ROW_HEIGHT = 62;
+const RAW_VIRTUAL_ROW_HEIGHT = 41;
 const RAW_VIRTUAL_OVERSCAN = 8;
 const RAW_VIRTUAL_MAX_HEIGHT = 640;
 
@@ -1537,6 +1537,8 @@ const STITCH_ICON_PATHS = {
   delete: <><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></>,
   check: <><path d="M20 6 9 17l-5-5"/></>,
   close: <><path d="M18 6 6 18"/><path d="m6 6 12 12"/></>,
+  search: <><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></>,
+  plus: <><path d="M12 5v14"/><path d="M5 12h14"/></>,
   warning: <><path d="m21.73 18-8-14a2 2 0 0 0-3.46 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></>,
 };
 
@@ -1849,6 +1851,7 @@ const LANGUAGE_OPTIONS = [{key:'en',label:'English'},{key:'it',label:'Italiano'}
 const EXTRA_I18N = {
   it: {
     close:'Chiudi',
+    selectRow:'Seleziona',
     newWorkspace:'Nuovo workspace',
     signupTitle:'Inizia caricando il tuo primo database',
     signupHelp:'Carica un estratto Excel Amex oppure un backup JSON di homefin.',
@@ -1866,6 +1869,7 @@ const EXTRA_I18N = {
   },
   en: {
     close:'Close',
+    selectRow:'Select',
     newWorkspace:'New workspace',
     signupTitle:'Start by uploading your first database',
     signupHelp:'Upload an Amex Excel statement or a homefin JSON backup.',
@@ -2872,6 +2876,7 @@ export default function App() {
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const [showMore, setShowMore] = useState(false);
+  const [expandedTxId, setExpandedTxId] = useState(null);
   const [forecastExpanded, setForecastExpanded] = useState(false);
   const fileRef = useRef();
   const backupRef = useRef();
@@ -4499,13 +4504,11 @@ export default function App() {
           </div>
         </>}
 
-        {activeTab === 'raw' && <div className="hf-card hf-data-card">
-          <div className="hf-data-toolbar">
-            <div>
-              <div className="hf-card-title hf-data-title"><IconLabel icon="data">{T('data')} · {rangeLabel}</IconLabel></div>
-            </div>
-            <div className="hf-data-summary"><b>{fmtDec(rawFilteredSubtotal)}</b><br />{scopedRawRows.length} {T('filteredRows')}</div>
-            {isCurrentAdmin && <button className={showManualTxForm ? 'profile-primary-btn' : 'profile-secondary-btn'} onClick={()=>showManualTxForm ? addManualTransaction() : setShowManualTxForm(true)}>{showManualTxForm ? T('saveTransaction') : T('addTransaction')}</button>}
+        {activeTab === 'raw' && <div className="hfx-page hfx-data">
+          <div className="hfx-data-bar">
+            <label className="hfx-search"><Icon name="search" size={15} /><input type="search" value={rawDraftFilters.desc} onChange={(e)=>updateRawDraftFilter('desc', e.target.value)} onKeyDown={handleRawFilterKeyDown} onBlur={applyRawDraftFiltersNow} placeholder={T('merchantDesc')} aria-label={T('merchantDesc')} /></label>
+            <div className="hfx-data-sum"><b className="hfx-num">{fmtDec(rawFilteredSubtotal)}</b><span>{scopedRawRows.length} {T('filteredRows')}</span></div>
+            {isCurrentAdmin && <button type="button" className={`hfx-btn ${showManualTxForm ? 'is-primary' : ''}`} onClick={()=>showManualTxForm ? addManualTransaction() : setShowManualTxForm(true)}>{!showManualTxForm && <Icon name="plus" size={14} />}<span>{showManualTxForm ? T('saveTransaction') : T('addTransaction')}</span></button>}
           </div>
           {isCurrentAdmin && showManualTxForm && <div className="hf-manual-row-form">
             <input type="date" value={manualTxDraft.date} onChange={(e)=>updateManualTxDraft({date:e.target.value})} style={S.input} />
@@ -4513,7 +4516,7 @@ export default function App() {
             <input value={manualTxDraft.amount} onChange={(e)=>updateManualTxDraft({amount:e.target.value})} placeholder={T('amount')} style={S.input} />
             <select value={manualTxDraft.holder} onChange={(e)=>updateManualTxDraft({holder:e.target.value})} style={S.input}>{holderOptions.map((h)=><option key={h} value={h}>{h}</option>)}</select>
             <select value={manualTxDraft.source} onChange={(e)=>{ const opt = ACCOUNT_IMPORT_OPTIONS.find((item)=>item.source===e.target.value) || ACCOUNT_IMPORT_OPTIONS[0]; updateManualTxDraft({source:opt.source, accountName:opt.accountName}); }} style={S.input}>{ACCOUNT_IMPORT_OPTIONS.map((opt)=><option key={opt.id} value={opt.source}>{sourceLabel(opt.source)}</option>)}</select>
-            <select value={manualTxDraft.category} onChange={(e)=>updateManualTxDraft({category:e.target.value})} style={S.input}>{Object.entries(categoryConfig).map(([key,cfg])=><option key={key} value={key}>{cfg.icon} {cfg.label}</option>)}</select>
+            <select value={manualTxDraft.category} onChange={(e)=>updateManualTxDraft({category:e.target.value})} style={S.input}>{Object.entries(categoryConfig).map(([key,cfg])=><option key={key} value={key}>{cfg.label}</option>)}</select>
             <select value={manualTxDraft.personalFlag} onChange={(e)=>updateManualTxDraft({personalFlag:e.target.value})} style={S.input}><option value="personale">{T('personal')}</option><option value="comune">{T('common')}</option></select>
             <select value={manualTxDraft.cashflow} onChange={(e)=>updateManualTxDraft({cashflow:e.target.value})} style={S.input}><option value="expense">{T('cashflowExpense')}</option><option value="income">{T('cashflowIncome')}</option><option value="excluded">{T('cashflowExcluded')}</option></select>
             <button className="profile-primary-btn" onClick={addManualTransaction}>{T('saveTransaction')}</button>
@@ -4522,7 +4525,7 @@ export default function App() {
           {selectedRawIds.length > 0 && <div className="hf-bulk-bar">
             <div className="hf-bulk-count">{selectedRawIds.length} {T('selectedRows')}</div>
             <select value={bulkEdit.holder} onChange={(e)=>setBulkEdit((b)=>({...b,holder:e.target.value}))} style={S.input}><option value="">{T('holderNoChange')}</option>{holderOptions.map((h)=><option key={h} value={h}>{h}</option>)}</select>
-            <select value={bulkEdit.category} onChange={(e)=>setBulkEdit((b)=>({...b,category:e.target.value}))} style={S.input}><option value="">{T('categoryNoChange')}</option>{Object.entries(categoryConfig).map(([key,cfg])=><option key={key} value={key}>{cfg.icon} {cfg.label}</option>)}</select>
+            <select value={bulkEdit.category} onChange={(e)=>setBulkEdit((b)=>({...b,category:e.target.value}))} style={S.input}><option value="">{T('categoryNoChange')}</option>{Object.entries(categoryConfig).map(([key,cfg])=><option key={key} value={key}>{cfg.label}</option>)}</select>
             <select value={bulkEdit.personalFlag} onChange={(e)=>setBulkEdit((b)=>({...b,personalFlag:e.target.value}))} style={S.input}><option value="">{T('flagNoChange')}</option><option value="comune">{T('common')}</option><option value="personale">{T('personal')}</option></select>
             <select value={bulkEdit.cashflow} onChange={(e)=>setBulkEdit((b)=>({...b,cashflow:e.target.value}))} style={S.input}><option value="">{T('cashflowNoChange')}</option><option value="expense">{T('cashflowExpense')}</option><option value="income">{T('cashflowIncome')}</option><option value="excluded">{T('cashflowExcluded')}</option></select>
             <select value={bulkEdit.subscription} onChange={(e)=>setBulkEdit((b)=>({...b,subscription:e.target.value}))} style={S.input}><option value="">{T('subscriptionNoChange')}</option><option value="__clear__">{T('clear')}</option><option value="manual">{T('manualSubscription')}</option></select>
@@ -4532,7 +4535,8 @@ export default function App() {
           </div>}
           {rawRowsLimited && <div className="hf-data-notice">{T('latestRowsNotice').replace('{count}', RAW_BASE_RENDER_LIMIT)}</div>}
           {rawFilteredRowsLimited && <div className="hf-data-notice is-muted"><span>{T('filteredRowsNotice').replace('{shown}', renderedRawRows.length).replace('{total}', sortedScopedRawRows.length)}</span><button className="profile-secondary-btn" onClick={()=>setRawFilteredRenderLimit(sortedScopedRawRows.length)}>{T('showAll')}</button></div>}
-          <div className="hf-table-wrap" onScroll={(event)=>setRawVirtualScrollTop(event.currentTarget.scrollTop)}>
+          <section className="hfx-panel hfx-table-panel hfx-desktop-only">
+          <div className="hf-table-wrap hfx-table-wrap" onScroll={(event)=>setRawVirtualScrollTop(event.currentTarget.scrollTop)}>
             <table className="hf-data-table hf-raw-data-table">
               <thead>
                 <tr className="hf-data-head-row">
@@ -4561,10 +4565,10 @@ export default function App() {
                     <td><div className="hf-data-desc">{row.desc}</div></td>
                     <td><select className="hf-data-select-holder" value={canonicalHolderDisplay(row.holder)} onChange={(e)=>overrideHolder(row, e.target.value)} style={S.input}>{holderOptions.map((h)=><option key={h} value={h}>{h}</option>)}</select></td>
                     <td className="hf-data-muted hf-data-strong">{row.sourceLabel}</td>
-                    <td className="hf-data-muted">{row.paese || '—'}</td>
-                    <td className="hf-data-strong">{row.amountLabel}</td>
-                    <td><select className="hf-data-select-category" value={row.categoryKey} onChange={(e)=>handleRawCategoryChange(row, e.target.value)} style={{ ...S.input, color: categoryConfig[row.categoryKey]?.color || theme.text }}>{Object.entries(categoryConfig).map(([key, cfg]) => <option key={key} value={key}>{cfg.icon} {cfg.label}</option>)}<option value="__new_category__">{T('newCategory')}</option></select></td>
-                    <td><select className="hf-data-select-flag" value={row.personalFlag} onChange={(e)=>overridePersonalFlag(row, e.target.value)} style={{ ...S.input, color: row.personalFlag === 'personale' ? theme.accent : theme.subtext }}><option value="comune">{T('common')}</option><option value="personale">{T('personal')}</option></select></td>
+                    <td className="hf-data-muted hfx-td-country">{row.paese || '—'}</td>
+                    <td className="hf-data-strong hfx-num hfx-td-amount">{row.amountLabel}</td>
+                    <td><select className="hf-data-select-category" value={row.categoryKey} onChange={(e)=>handleRawCategoryChange(row, e.target.value)} style={{ ...S.input, '--cat': categoryConfig[row.categoryKey]?.color || theme.subtext }}>{Object.entries(categoryConfig).map(([key, cfg]) => <option key={key} value={key}>{cfg.label}</option>)}<option value="__new_category__">{T('newCategory')}</option></select></td>
+                    <td><select className="hf-data-select-flag" value={row.personalFlag} onChange={(e)=>overridePersonalFlag(row, e.target.value)} style={S.input}><option value="comune">{T('common')}</option><option value="personale">{T('personal')}</option></select></td>
                     <td><select className={`hf-cashflow-select is-${row.cashflowType}`} value={row.cashflowType} onChange={(e)=>overrideCashflowExclusion(row, e.target.value)} style={S.input}><option value="expense">{T('cashflowExpense')}</option><option value="income">{T('cashflowIncome')}</option><option value="excluded">{T('cashflowExcluded')}</option></select>{row.isRefund && row.cashflowType === 'expense' ? <div className="hf-data-refund">{T('refund')}</div> : null}</td>
                   </tr>
                 ))}
@@ -4573,12 +4577,39 @@ export default function App() {
               <tfoot>
                 <tr className="hf-data-footer-row">
                   <td colSpan={6} className="hf-data-strong">{T('subtotal')}</td>
-                  <td className="hf-data-strong">{fmtDec(rawFilteredSubtotal)}</td>
+                  <td className="hf-data-strong hfx-num hfx-td-amount">{fmtDec(rawFilteredSubtotal)}</td>
                   <td colSpan={3} className="hf-data-muted">{(rawRowsLimited || rawFilteredRowsLimited) ? `${renderedRawRows.length}/${scopedRawRows.length}` : scopedRawRows.length} {T('filteredTransactions')}</td>
                 </tr>
               </tfoot>
             </table>
           </div>
+          </section>
+          <section className="hfx-txlist hfx-mobile-only" aria-label={T('transactions')}>
+            {!renderedRawRows.length && <p className="hfx-muted">{T('noDataInRange')}</p>}
+            {renderedRawRows.reduce((groups, row) => { const last = groups[groups.length - 1]; if (last && last.date === row.date) last.rows.push(row); else groups.push({ date: row.date, rows: [row] }); return groups; }, []).map((group) => {
+              const dayTotal = group.rows.reduce((sum, row) => row.cashflowType === 'expense' ? round2(sum + Number(row.amount || 0)) : sum, 0);
+              const d = new Date(`${group.date}T12:00:00`);
+              const dayLabel = Number.isNaN(d.getTime()) ? group.date : d.toLocaleDateString(currentLang === 'it' ? 'it-IT' : 'en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: d.getFullYear() === new Date().getFullYear() ? undefined : 'numeric' });
+              return <div key={group.date} className="hfx-txgroup">
+                <div className="hfx-txdate"><span>{dayLabel}</span>{dayTotal > 0 && <span className="hfx-num">{fmtDec(dayTotal)}</span>}</div>
+                <ul>{group.rows.map((row) => { const cfg = categoryConfig[row.categoryKey] || { label: row.categoryKey, color: theme.subtext }; const open = expandedTxId === row.id; return <li key={row.id} className={`${open ? 'is-open' : ''} ${selectedRawSet.has(row.id) ? 'is-selected' : ''}`}>
+                  <button type="button" className="hfx-tx" aria-expanded={open} onClick={()=>setExpandedTxId(open ? null : row.id)}>
+                    <span className="hfx-dot" style={{ background: cfg.color }} aria-hidden="true" />
+                    <span className="hfx-tx-main"><span className="hfx-tx-desc">{row.desc}</span><span className="hfx-tx-meta">{canonicalHolderDisplay(row.holder)} · {cfg.label}{row.personalFlag === 'personale' ? ` · ${T('personal')}` : ''}{row.cashflowType !== 'expense' ? ` · ${row.cashflowType === 'income' ? T('cashflowIncome') : T('cashflowExcluded')}` : ''}</span></span>
+                    <span className={`hfx-tx-amt hfx-num ${row.cashflowType === 'income' ? 'is-pos' : row.cashflowType === 'excluded' ? 'is-muted' : ''}`}>{row.amountLabel}</span>
+                  </button>
+                  {open && <div className="hfx-tx-edit">
+                    <label><span>{T('holder')}</span><select className="hfx-input" value={canonicalHolderDisplay(row.holder)} onChange={(e)=>overrideHolder(row, e.target.value)}>{holderOptions.map((h)=><option key={h} value={h}>{h}</option>)}</select></label>
+                    <label><span>{T('category')}</span><select className="hfx-input" value={row.categoryKey} onChange={(e)=>handleRawCategoryChange(row, e.target.value)}>{Object.entries(categoryConfig).map(([key, c]) => <option key={key} value={key}>{c.label}</option>)}<option value="__new_category__">{T('newCategory')}</option></select></label>
+                    <label><span>{T('flag')}</span><select className="hfx-input" value={row.personalFlag} onChange={(e)=>overridePersonalFlag(row, e.target.value)}><option value="comune">{T('common')}</option><option value="personale">{T('personal')}</option></select></label>
+                    <label><span>{T('cashflow')}</span><select className="hfx-input" value={row.cashflowType} onChange={(e)=>overrideCashflowExclusion(row, e.target.value)}><option value="expense">{T('cashflowExpense')}</option><option value="income">{T('cashflowIncome')}</option><option value="excluded">{T('cashflowExcluded')}</option></select></label>
+                    <div className="hfx-tx-facts"><span>{row.sourceLabel}</span>{row.paese && <span>{row.paese}</span>}{row.isRefund && <span>{T('refund')}</span>}</div>
+                    <label className="hfx-check"><input type="checkbox" checked={selectedRawSet.has(row.id)} onChange={()=>toggleRawRowSelection(row.id)} /><span>{T('selectRow')}</span></label>
+                  </div>}
+                </li>; })}</ul>
+              </div>;
+            })}
+          </section>
         </div>}
 
         {activeTab === 'notes' && <div className="hf-card hf-panel-card">
