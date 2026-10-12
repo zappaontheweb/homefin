@@ -1569,22 +1569,22 @@ function HouseholdEditor({ value, onChange, theme, input, T }) {
   const setSplit = (id, pct) => onChange({ ...value, sharedSplit: { ...(value.sharedSplit || {}), [id]: pct } });
   const named = members.filter((m) => String(m.name || '').trim());
   const splitTotal = named.reduce((sum, m) => sum + Number(value.sharedSplit?.[memberIdFromName(m.name)] || 0), 0);
-  return <div style={{ display:'grid', gap:10 }}>
-    {members.map((m, idx) => <div key={idx} style={{ display:'grid', gridTemplateColumns:'1fr 1.3fr auto', gap:8, alignItems:'center' }}>
-      <input style={input} placeholder={T('memberName')} value={m.name || ''} onChange={(e) => update(idx, { name: e.target.value })} />
-      <input style={input} placeholder={T('memberKeywords')} value={Array.isArray(m.keywords) ? m.keywords.join(', ') : (m.keywords || '')} onChange={(e) => update(idx, { keywords: e.target.value })} />
-      <button type="button" onClick={() => remove(idx)} disabled={members.length <= 1} title={T('delete')} style={{ background:'transparent', border:'1px solid '+theme.border, borderRadius:12, color: members.length <= 1 ? theme.subtext : '#EF4444', padding:'10px 12px', cursor: members.length <= 1 ? 'not-allowed' : 'pointer', fontWeight:900 }}>×</button>
+  return <div className="hfx-household">
+    {members.map((m, idx) => <div key={idx} className="hfx-member-row">
+      <input className="hfx-field" aria-label={T('memberName')} placeholder={T('memberName')} value={m.name || ''} onChange={(e) => update(idx, { name: e.target.value })} />
+      <input className="hfx-field" aria-label={T('memberKeywords')} placeholder={T('memberKeywords')} value={Array.isArray(m.keywords) ? m.keywords.join(', ') : (m.keywords || '')} onChange={(e) => update(idx, { keywords: e.target.value })} />
+      <button type="button" className="hfx-icon-btn" onClick={() => remove(idx)} disabled={members.length <= 1} aria-label={`${T('delete')} ${m.name || ''}`.trim()}><Icon name="close" size={16} /></button>
     </div>)}
-    <button type="button" onClick={add} style={{ background:theme.input, border:'1px dashed '+theme.border, borderRadius:12, color:theme.text, padding:'10px 12px', cursor:'pointer', fontWeight:800 }}>+ {T('addMember')}</button>
-    <div style={{ fontSize:12, color:theme.subtext }}>{T('memberKeywordsHelp')}</div>
-    {named.length > 1 && <div style={{ display:'grid', gap:8, marginTop:4 }}>
-      <div style={{ fontSize:13, fontWeight:900 }}>{T('sharedSplit')}</div>
-      <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
-        {[['equal', T('splitEqual')], ['custom', T('splitCustom')]].map(([mode, label]) => <button type="button" key={mode} onClick={() => onChange({ ...value, splitMode: mode })} style={{ background: value.splitMode === mode ? theme.accentSoft : theme.input, border:'1px solid '+(value.splitMode === mode ? theme.accent : theme.border), color: value.splitMode === mode ? theme.accent : theme.text, borderRadius:999, padding:'8px 12px', fontWeight:900, cursor:'pointer' }}>{label}</button>)}
+    <button type="button" className="hfx-btn hfx-btn-quiet" onClick={add}><Icon name="plus" size={14} /><span>{T('addMember')}</span></button>
+    <p className="hfx-help">{T('memberKeywordsHelp')}</p>
+    {named.length > 1 && <div className="hfx-household-split">
+      <div className="hfx-field-label">{T('sharedSplit')}</div>
+      <div className="hfx-seg">
+        {[['equal', T('splitEqual')], ['custom', T('splitCustom')]].map(([mode, label]) => <button type="button" key={mode} className={value.splitMode === mode ? 'is-active' : ''} aria-pressed={value.splitMode === mode} onClick={() => onChange({ ...value, splitMode: mode })}>{label}</button>)}
       </div>
       {value.splitMode === 'custom' && <>
-        {named.map((m) => { const id = memberIdFromName(m.name); return <label key={id} style={{ display:'grid', gridTemplateColumns:'1fr 110px', gap:8, alignItems:'center', fontSize:13 }}><span>{m.name}</span><input style={input} type="number" min="0" max="100" value={value.sharedSplit?.[id] ?? ''} onChange={(e) => setSplit(id, e.target.value === '' ? '' : Number(e.target.value))} placeholder="%" /></label>; })}
-        <div style={{ fontSize:12, color: Math.round(splitTotal) === 100 ? theme.subtext : '#EF4444' }}>{T('splitTotal')}: {splitTotal || 0}%</div>
+        {named.map((m) => { const id = memberIdFromName(m.name); return <label key={id} className="hfx-split-row"><span>{m.name}</span><input className="hfx-field hfx-num" type="number" min="0" max="100" value={value.sharedSplit?.[id] ?? ''} onChange={(e) => setSplit(id, e.target.value === '' ? '' : Number(e.target.value))} placeholder="%" /></label>; })}
+        <div className={`hfx-help ${Math.round(splitTotal) === 100 ? '' : 'is-neg'}`}>{T('splitTotal')}: {splitTotal || 0}%</div>
       </>}
     </div>}
   </div>;
@@ -1669,51 +1669,58 @@ function SetupWizard({ onComplete }) {
     }
     setBusy(false);
   };
-  const section = (title, children, help) => <div style={{ display:'grid', gap:10, paddingBottom:16, marginBottom:16, borderBottom:'1px solid '+theme.border }}>
-    <div style={{ fontSize:17, fontWeight:900 }}>{title}</div>
-    {help && <div style={{ fontSize:12, color:theme.subtext, lineHeight:1.5 }}>{help}</div>}
-    {children}
-  </div>;
-  return <div style={{ minHeight:'100vh', background: theme.loginBg || theme.bg, color:theme.text, display:'flex', alignItems:'center', justifyContent:'center', padding:24, fontFamily:"'Inter',system-ui", position:'relative', overflowX:'hidden' }}>
-    <div style={{ position:'absolute', top:24, right:24, display:'flex', gap:10, zIndex:2 }}>
-      <CircleToggle onClick={toggleTheme} title={themeMode === 'dark' ? T('light') : T('dark')} theme={theme}><Icon name="theme" /></CircleToggle>
-      <CircleToggle onClick={toggleLang} title={T('language')} theme={theme}><Icon name="language" /></CircleToggle>
-    </div>
-    <div style={{ width:'min(1080px,100%)', display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(min(340px,100%),1fr))', gap:22, alignItems:'start', zIndex:1, marginTop:56 }}>
-      <div style={{ background:theme.heroPanel || theme.headerGradient, border:'1px solid '+theme.border, borderRadius:34, padding:34, boxShadow:theme.shadow, display:'flex', flexDirection:'column', gap:28 }}>
-        <BrandLogo theme={theme} />
-        <div><div style={{ display:'inline-flex', padding:'8px 12px', borderRadius:999, background:theme.accentSoft, color:theme.accent, fontSize:12, fontWeight:900, marginBottom:18 }}>{T('firstTimeSetup')}</div><h1 style={{ margin:0, color:theme.text, fontSize:44, lineHeight:1, letterSpacing:-2, fontFamily:"'Manrope','Inter',system-ui" }}>{T('setupTitle')}</h1><p style={{ color:theme.subtext, fontSize:15, lineHeight:1.6, marginTop:18 }}>{T('setupSubtitle')}</p></div>
-        <div style={{ display:'grid', gap:10 }}>{[['1',T('setupStepToken')],['2',T('createAdmin')],['3',T('setupStepHousehold')],['4',T('setupStepData')]].map(([n,label]) => <div key={n} style={{ display:'flex', gap:12, alignItems:'center', background:theme.panel, border:'1px solid '+theme.border, borderRadius:16, padding:'12px 14px' }}><div style={{ fontSize:18, fontWeight:900, color:theme.accent }}>{n}</div><div style={{ fontSize:13, color:theme.text, fontWeight:800 }}>{label}</div></div>)}</div>
+  const steps = [T('setupStepToken'), T('createAdmin'), T('setupStepHousehold'), T('setupStepData')];
+  const section = (n, title, children, help) => <section className="hfx-auth-section" aria-labelledby={`setup-step-${n}`}>
+    <div className="hfx-auth-section-head"><span className="hfx-step-num hfx-num">{n}</span><h2 id={`setup-step-${n}`}>{title}</h2></div>
+    {help && <p className="hfx-help">{help}</p>}
+    <div className="hfx-auth-fields">{children}</div>
+  </section>;
+  return <div className="hfx-auth is-setup" data-theme={themeMode}>
+    <header className="hfx-auth-top">
+      <div className="hfx-brand"><img className="hfx-logo" src="/logo.png" alt="" /><span>homefin</span></div>
+      <div className="hfx-auth-tools">
+        <button type="button" className="hfx-icon-btn" onClick={toggleTheme} aria-label={themeMode === 'dark' ? T('light') : T('dark')}><Icon name="theme" size={16} /></button>
+        <button type="button" className="hfx-icon-btn hfx-lang" onClick={toggleLang} aria-label={T('language')}>{lang.toUpperCase()}</button>
       </div>
-      <div style={{ background:theme.panel, border:'1px solid '+theme.border, borderRadius:34, padding:28, boxShadow:theme.shadow }}>
-        {section(T('setupStepToken'), <input style={input} type="password" autoComplete="off" placeholder="APP_PASSWORD" value={setupToken} onChange={(e) => setSetupToken(e.target.value)} />, T('setupTokenHelp'))}
-        {section(T('createAdmin'), <>
-          <input style={input} placeholder={T('name')} value={admin.name} onChange={e=>setAdmin(a=>({...a,name:e.target.value}))}/>
-          <input style={input} placeholder={T('email')} value={admin.email} onChange={e=>setAdmin(a=>({...a,email:e.target.value}))}/>
-          <input style={input} type='password' autoComplete="new-password" placeholder={T('password')} value={admin.password} onChange={e=>setAdmin(a=>({...a,password:e.target.value}))}/>
-          <input style={input} type='password' autoComplete="new-password" placeholder={T('confirmNewPassword')} value={admin.confirm} onChange={e=>setAdmin(a=>({...a,confirm:e.target.value}))}/>
-        </>, T('setupPasswordHelp'))}
-        {section(T('setupStepHousehold'), <HouseholdEditor value={household} onChange={setHousehold} theme={theme} input={input} T={T} />, T('householdHelp'))}
-        {section(T('setupStepData'), <>
-          <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
-            {[['empty', T('startEmpty')], ['demo', T('startDemo')], ['file', T('startFile')]].map(([key, label]) => <button type="button" key={key} onClick={() => setStartWith(key)} style={{ background: startWith === key ? theme.accentSoft : theme.input, border:'1px solid '+(startWith === key ? theme.accent : theme.border), color: startWith === key ? theme.accent : theme.text, borderRadius:999, padding:'9px 13px', fontWeight:900, cursor:'pointer' }}>{label}</button>)}
+    </header>
+    <main className="hfx-auth-grid">
+      <aside className="hfx-auth-intro">
+        <div className="hfx-eyebrow">{T('firstTimeSetup')}</div>
+        <h1>{T('setupTitle')}</h1>
+        <p>{T('setupSubtitle')}</p>
+        <ol className="hfx-steps">{steps.map((label, i) => <li key={label}><span className="hfx-num">{i + 1}</span>{label}</li>)}</ol>
+      </aside>
+      <div className="hfx-auth-card">
+        {section(1, T('setupStepToken'), <input className="hfx-field" type="password" autoComplete="off" aria-label={T('setupStepToken')} placeholder="APP_PASSWORD" value={setupToken} onChange={(e) => setSetupToken(e.target.value)} />, T('setupTokenHelp'))}
+        {section(2, T('createAdmin'), <>
+          <label className="hfx-label"><span>{T('name')}</span><input className="hfx-field" autoComplete="name" value={admin.name} onChange={e=>setAdmin(a=>({...a,name:e.target.value}))}/></label>
+          <label className="hfx-label"><span>{T('email')}</span><input className="hfx-field" type="email" autoComplete="email" value={admin.email} onChange={e=>setAdmin(a=>({...a,email:e.target.value}))}/></label>
+          <div className="hfx-field-pair">
+            <label className="hfx-label"><span>{T('password')}</span><input className="hfx-field" type="password" autoComplete="new-password" value={admin.password} onChange={e=>setAdmin(a=>({...a,password:e.target.value}))}/></label>
+            <label className="hfx-label"><span>{T('confirmNewPassword')}</span><input className="hfx-field" type="password" autoComplete="new-password" value={admin.confirm} onChange={e=>setAdmin(a=>({...a,confirm:e.target.value}))}/></label>
           </div>
-          {startWith === 'demo' && <div style={{ fontSize:12, color:theme.subtext }}>{T('startDemoHelp')}</div>}
+          <p className="hfx-help">{T('setupPasswordHelp')}</p>
+        </>)}
+        {section(3, T('setupStepHousehold'), <HouseholdEditor value={household} onChange={setHousehold} theme={theme} input={input} T={T} />, T('householdHelp'))}
+        {section(4, T('setupStepData'), <>
+          <div className="hfx-seg" role="group" aria-label={T('setupStepData')}>
+            {[['empty', T('startEmpty')], ['demo', T('startDemo')], ['file', T('startFile')]].map(([key, label]) => <button type="button" key={key} className={startWith === key ? 'is-active' : ''} aria-pressed={startWith === key} onClick={() => setStartWith(key)}>{label}</button>)}
+          </div>
+          {startWith === 'demo' && <p className="hfx-help">{T('startDemoHelp')}</p>}
           {startWith === 'file' && <>
             <input ref={fileRef} type='file' accept='.json,.xlsx,.xls' onChange={e=>readDatabase(e.target.files?.[0])} style={{ display:'none' }} />
-            <button type="button" className="hf-inline-icon-button" onClick={()=>fileRef.current?.click()} style={{ width:'100%', background:theme.input, border:'1px solid '+theme.border, borderRadius:14, padding:'12px', color:theme.text, fontSize:14, fontWeight:900, cursor:'pointer' }}>{db ? <><Icon name="check" /> {T('setupReady')}</> : <><Icon name="import" /> {T('uploadDatabase')}</>}</button>
-            <div style={{ fontSize:12, color:theme.subtext }}>{fileName ? `${fileName} · ${db?.transactions?.length || 0} ${T('transactions')}` : T('setupDatabaseHelp')}</div>
+            <button type="button" className="hfx-btn hfx-btn-block" onClick={()=>fileRef.current?.click()}>{db ? <><Icon name="check" size={15} /> {T('setupReady')}</> : <><Icon name="import" size={15} /> {T('uploadDatabase')}</>}</button>
+            <p className="hfx-help">{fileName ? `${fileName} · ${db?.transactions?.length || 0} ${T('transactions')}` : T('setupDatabaseHelp')}</p>
           </>}
         </>)}
-        {err && <div style={{ color:'#EF4444', fontSize:12, marginBottom:12, whiteSpace:'pre-wrap' }}>{err}</div>}
-        <button onClick={submit} disabled={busy} style={{ width:'100%', background:theme.gradientPrimary || theme.accent, border:'none', borderRadius:16, padding:'15px', color:theme.onAccent || '#fff', fontSize:15, fontWeight:900, cursor:'pointer', opacity:busy?0.7:1 }}>{busy ? T('loading') : T('createWorkspace')}</button>
+        {err && <div className="hfx-error" role="alert">{err}</div>}
+        <button type="button" className="hfx-btn is-primary hfx-btn-block hfx-btn-lg" onClick={submit} disabled={busy}>{busy ? T('loading') : T('createWorkspace')}</button>
       </div>
-    </div>
+    </main>
   </div>;
 }
 
 function Login({ onLogin }) {
-  const [mobilePanel, setMobilePanel] = useState('login');
   const [userId, setUserId] = useState(() => lsGet(LS.user));
   const [pw, setPw] = useState('');
   const [err, setErr] = useState('');
@@ -1736,45 +1743,37 @@ function Login({ onLogin }) {
     }
     setBusy(false);
   };
-  const handleKey = (e) => { if (e.key === 'Enter') submitLogin(); };
   const toggleTheme = () => { const next = themeMode === 'dark' ? 'light' : 'dark'; setThemeMode(next); lsSet(LS.theme, next); };
   const toggleLang = () => { const next = lang === 'en' ? 'it' : 'en'; setLang(next); lsSet(LS.lang, next); };
 
   return (
-    <div className="login-root hf-login" style={{ minHeight:'100vh', background: theme.loginBg || theme.bg, color:theme.text, display:'flex', alignItems:'center', justifyContent:'center', padding:24, fontFamily:"'Inter',system-ui", position:'relative', overflowX:'hidden', overflowY:'auto' }}>
-      <div className="login-toggles" style={{ position:'absolute', top:24, right:24, display:'flex', gap:10, zIndex:2 }}>
-        <CircleToggle onClick={toggleTheme} title={themeMode === 'dark' ? T('light') : T('dark')} theme={theme}><Icon name="theme" /></CircleToggle>
-        <CircleToggle onClick={toggleLang} title={T('language')} theme={theme}><Icon name="language" /></CircleToggle>
-      </div>
-      <div className="login-grid" style={{ width:'min(1080px,100%)', display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(min(320px, 100%), 1fr))', gap:24, alignItems:'stretch', zIndex:1 }}>
-        <div className="mobile-switch">
-          {[[ 'landing', 'Intro' ], [ 'login', T('login') ]].map(([key,label]) => (
-            <button key={key} onClick={() => { setMobilePanel(key); setErr(''); }} style={{ background:mobilePanel===key?theme.accentSoft:theme.panel, border:'1px solid '+(mobilePanel===key?theme.accent:theme.border), color:mobilePanel===key?theme.accent:theme.text, cursor:'pointer' }}>{label}</button>
-          ))}
+    <div className="hfx-auth is-login" data-theme={themeMode}>
+      <header className="hfx-auth-top">
+        <div className="hfx-brand"><img className="hfx-logo" src="/logo.png" alt="" /><span>homefin</span></div>
+        <div className="hfx-auth-tools">
+          <button type="button" className="hfx-icon-btn" onClick={toggleTheme} aria-label={themeMode === 'dark' ? T('light') : T('dark')}><Icon name="theme" size={16} /></button>
+          <button type="button" className="hfx-icon-btn hfx-lang" onClick={toggleLang} aria-label={T('language')}>{lang.toUpperCase()}</button>
         </div>
-        <div className={`login-hero ${mobilePanel === 'landing' ? 'mobile-active' : ''}`} style={{ display:'flex', flexDirection:'column', justifyContent:'space-between', minHeight:560, background:theme.heroPanel || theme.headerGradient, border:'1px solid ' + theme.border, borderRadius:34, padding:34, boxShadow:theme.shadow, overflow:'hidden', position:'relative' }}>
-          <div className="login-hero-logo"><BrandLogo theme={theme} /></div>
-          <div className="login-hero-copy" style={{ marginTop:34, maxWidth:560, position:'relative' }}>
-            <div style={{ display:'inline-flex', padding:'8px 12px', borderRadius:999, background:theme.accentSoft, color:theme.accent, fontSize:12, fontWeight:900, marginBottom:18 }}>{T('loginKicker')}</div>
-            <h1 style={{ margin:0, color:theme.text, fontSize:52, lineHeight:0.95, letterSpacing:-2.4, fontFamily:"'Manrope','Inter',system-ui" }}>{T('loginHeadline')}</h1>
-            <p style={{ color:theme.subtext, fontSize:16, lineHeight:1.6, marginTop:20, maxWidth:500 }}>{T('loginTagline')}</p>
-          </div>
-          <div className="login-feature-grid" style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(120px,1fr))', gap:12, position:'relative' }}>
-            {[[T('rules'), T('smartCategorization')],[T('flag'), T('personalVsShared')],[T('trends'), T('monthlyClarity')]].map(([a,b]) => <div key={a} style={{ background:theme.panel, border:'1px solid '+theme.border, borderRadius:20, padding:16 }}><div style={{ fontSize:17, fontWeight:900 }}>{a}</div><div style={{ fontSize:12, color:theme.subtext, marginTop:5 }}>{b}</div></div>)}
-          </div>
-        </div>
-        <div className={`login-auth ${mobilePanel === 'login' ? 'mobile-active' : ''}`} style={{ background:theme.panel, border:'1px solid ' + theme.border, borderRadius:34, padding:28, boxShadow:theme.shadow, display:'flex', flexDirection:'column', justifyContent:'center' }}>
-          <div className="login-auth-icon" style={{ width:64, height:64, borderRadius:21, display:'flex', alignItems:'center', justifyContent:'center', marginBottom:18, overflow:'hidden' }}><img src="/logo.png" alt="homefin" style={{ width:'100%', height:'100%', objectFit:'cover' }} /></div>
-          <div className="login-auth-title" style={{ color:theme.text, fontSize:30, fontWeight:950, letterSpacing:-1.2, marginBottom:8, fontFamily:"'Manrope','Inter',system-ui" }}>{T('login')}</div>
-          <div className="login-auth-underline" style={{ width:72, height:4, borderRadius:999, background:theme.gradientPrimary || theme.accent, marginBottom:18 }} />
-          <div className="login-auth-sub" style={{ fontSize:14, color:theme.subtext, lineHeight:1.5, marginBottom:10 }}>{T('loginSub')}</div>
-          <input placeholder={T('user')} autoComplete="username" value={userId} onChange={e => setUserId(e.target.value)} onKeyDown={handleKey} style={input} />
-          <input type="password" autoComplete="current-password" placeholder={T('password')} value={pw} onChange={e => setPw(e.target.value)} onKeyDown={handleKey} style={input} />
-          {err && <div style={{ color:'#EF4444', fontSize:12, marginBottom:10, whiteSpace:'pre-wrap' }}>{err}</div>}
-          <button className="login-auth-submit" onClick={submitLogin} disabled={busy} style={{ width:'100%', background:theme.gradientPrimary || theme.accent, border:'none', borderRadius:16, padding:'15px', color:theme.onAccent || '#fff', fontSize:15, fontWeight:900, cursor:'pointer', fontFamily:"'Inter',system-ui", boxShadow:'0 14px 34px rgba(45,212,191,0.22)', opacity:busy?0.7:1 }}>{busy ? T('loading') : T('login')}</button>
-          <div className="signup-help" style={{ marginTop:14, fontSize:12, color:theme.subtext, lineHeight:1.5 }}>{T('loginHelp')}</div>
-        </div>
-      </div>
+      </header>
+      <main className="hfx-auth-grid">
+        <aside className="hfx-auth-intro">
+          <div className="hfx-eyebrow">{T('loginKicker')}</div>
+          <h1>{T('loginHeadline')}</h1>
+          <p>{T('loginTagline')}</p>
+          <dl className="hfx-auth-features">
+            {[[T('rules'), T('smartCategorization')],[T('flag'), T('personalVsShared')],[T('trends'), T('monthlyClarity')]].map(([a,b]) => <div key={a}><dt>{a}</dt><dd>{b}</dd></div>)}
+          </dl>
+        </aside>
+        <form className="hfx-auth-card is-narrow" onSubmit={(e) => { e.preventDefault(); submitLogin(); }}>
+          <h2 className="hfx-auth-title">{T('login')}</h2>
+          <p className="hfx-help">{T('loginSub')}</p>
+          <label className="hfx-label"><span>{T('user')}</span><input className="hfx-field" autoComplete="username" autoCapitalize="none" value={userId} onChange={e => setUserId(e.target.value)} /></label>
+          <label className="hfx-label"><span>{T('password')}</span><input className="hfx-field" type="password" autoComplete="current-password" value={pw} onChange={e => setPw(e.target.value)} /></label>
+          {err && <div className="hfx-error" role="alert">{err}</div>}
+          <button type="submit" className="hfx-btn is-primary hfx-btn-block hfx-btn-lg" disabled={busy}>{busy ? T('loading') : T('login')}</button>
+          <p className="hfx-help">{T('loginHelp')}</p>
+        </form>
+      </main>
     </div>
   );
 }
