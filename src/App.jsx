@@ -1536,6 +1536,7 @@ const STITCH_ICON_PATHS = {
   account: <><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-8h6v8"/></>,
   delete: <><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></>,
   check: <><path d="M20 6 9 17l-5-5"/></>,
+  close: <><path d="M18 6 6 18"/><path d="m6 6 12 12"/></>,
   warning: <><path d="m21.73 18-8-14a2 2 0 0 0-3.46 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></>,
 };
 
@@ -1847,6 +1848,7 @@ const I18N = {
 const LANGUAGE_OPTIONS = [{key:'en',label:'English'},{key:'it',label:'Italiano'}];
 const EXTRA_I18N = {
   it: {
+    close:'Chiudi',
     newWorkspace:'Nuovo workspace',
     signupTitle:'Inizia caricando il tuo primo database',
     signupHelp:'Carica un estratto Excel Amex oppure un backup JSON di homefin.',
@@ -1863,6 +1865,7 @@ const EXTRA_I18N = {
     flag:'Flag', deleteUser:'Rimuovi utente', deleteUserConfirm:'Rimuovere questo utente?', firstAdminLocked:'Il primo admin non può essere rimosso', sharePassword:'Condividi password', copyPassword:'Copia password', passwordCreatedHelp:'Password creata. Copiala e condividila con il nuovo utente.', permissions:'Permessi', feature:'Funzione', viewData:'Vedere dati', editData:'Modificare dati', editRules:'Modificare regole', manageUsers:'Gestire utenti', manageCustomization:'Gestire personalizzazione', yes:'Sì', no:'No', resetFilters:'Reset', quickAll:'Tutto', quickYtd:'YTD', quickLast3:'Ultimi 3M', quickLast6:'Ultimi 6M', quickLast12:'Ultimi 12M', quickLastMonth:'Ultimo mese', pickRangeHelp:'Seleziona primo e ultimo periodo', notes:'Note', notesTab:'Note', trends:'Trend', notesMonth:'Mese', notesUser:'Utente', notesPersonalSpend:'Spese personali', notesText:'Note', notesCompleted:'Completato', notesHelp:'Note mensili per utente basate sui periodi correnti e sulle sole spese personali.', timeRange:'Periodo', viewBy:'Vista per', calendarType:'Tipologia calendario', quickRange:'Periodi rapidi', customRange:'Da - a', start:'Da', end:'A', cashflow:'Cashflow', includedInCashflow:'Incluso', excludedFromCashflow:'Escluso', exclude:'Escludi', include:'Includi', refund:'Rimborso', source:'Fonte', noneSelected:'0 selezionati', selectedCount:'selezionati', selectedRows:'righe selezionate', holderNoChange:'Titolare: nessuna modifica', categoryNoChange:'Categoria: nessuna modifica', flagNoChange:'Flag: nessuna modifica', cashflowNoChange:'Cashflow: nessuna modifica', subscriptionNoChange:'Abbonamento: nessuna modifica', clear:'Pulisci', apply:'Applica', selectVisible:'Seleziona visibili', executiveOverview:'Sintesi direzionale', categoryDrivers:'Driver categorie', sourceAccountDrivers:'Driver fonte/conto', openTrends:'Apri Trend', peopleSplit:'Split persone', byAccountSource:'Per conto / fonte', noDataInRange:'Nessun dato nel range selezionato.', averagePerPeriod:'Media per periodo', topCategory:'Categoria principale', shared:'Comuni', personalLabel:'Personali', sharedAllocationNote:'Le spese comuni sono divise secondo lo split del nucleo; le personali vanno al titolare.', profileWorkspaceSubtitle:'Profilo, dati, import, data health e personalizzazione.', dataImport:'Dati & Import', dataHealth:'Salute dati', rulesLogic:'Regole & Logica', revolutAccount:'Account Revolut', mpAccount:'Account MP', dataRefreshHelp:'Aggiorna la dashboard leggendo l’ultima versione salvata in KV.', bankCard:'Banca / carta', importSourceHelp:'Scegli la fonte prima di importare. Per Revolut (e MP in CSV) indica anche l’account, perché il file non contiene l’intestatario. I formati appresi compaiono qui sotto le banche integrate.', exportBackupHelp:'Scarica un backup completo ripristinabile con override totale del DB.', restoreBackupHelp:'Ripristina un backup JSON sostituendo integralmente il DB corrente.', importHistory:'Storico import', rowsRead:'Righe lette', duplicatesSkipped:'Duplicate ignorate', newRows:'nuove', files:'File', sheets:'Fogli', financialExcluded:'Movimenti finanziari esclusi', rulesApplied:'Regole applicate', showMoreImports:'Mostra altre importazioni', noImports:'Nessun import registrato ancora.', manualSubscription:'Abbonamento manuale', showAll:'Mostra tutto', latestRowsNotice:'Mostro le ultime {count} righe. Applica filtri o ricerca per restringere i risultati.', filteredRowsNotice:'Mostro {shown} di {total} righe filtrate per mantenere la tabella veloce.', showMoreRules:'Mostra altre 10', timeMachine:'Time Machine', timeMachineHelp:'Salva fino a 5 snapshot completi nel DB/KV tramite la normale API dell’app. Utile prima di importare una nuova banca o cambiare regole importanti.', timeMachineNamePlaceholder:'Nome backup (opzionale)', createBackup:'Crea backup', timeMachineEmpty:'Nessun backup salvato.', backupCreated:'Backup creato', backupDeleted:'Backup eliminato', backupRestored:'Backup ripristinato', restore:'Ripristina', download:'Scarica', restoreTimeMachineConfirm:'Ripristinare questo backup? Il database corrente verrà sostituito, mentre la lista Time Machine resterà disponibile.', formatsCount:'formati'
   },
   en: {
+    close:'Close',
     newWorkspace:'New workspace',
     signupTitle:'Start by uploading your first database',
     signupHelp:'Upload an Amex Excel statement or a homefin JSON backup.',
@@ -3718,10 +3721,12 @@ export default function App() {
   }, {});
   const overviewAvgPerPeriod = aggregateKeys.length ? round2(cur.total / aggregateKeys.length) : 0;
   const overviewTopCategory = Object.entries(cur.categories || {}).sort(([,a],[,b])=>b-a)[0] || null;
+  const overviewAccountSources = {};
   const overviewAccountRows = Object.entries(overviewTx.reduce((acc, tx) => {
     const source = sourceLabel(tx.source || tx.accountName || 'amex');
     const account = tx.accountName || source;
-    const key = `${source} · ${account}`;
+    const key = account === source || account.toLowerCase().startsWith(source.toLowerCase()) ? account : `${source} · ${account}`;
+    overviewAccountSources[key] = overviewAccountSources[key] || tx.source || tx.accountName || 'amex';
     acc[key] = round2((acc[key] || 0) + Number(tx.amount || 0));
     return acc;
   }, {})).sort(([,a],[,b])=>b-a).slice(0, 8);
@@ -4200,71 +4205,62 @@ export default function App() {
         </div>}
 
         {showFilters && <div className="hfx-scrim" onClick={() => { setShowFilters(false); setShowMobileFilters(false); }} />}
-        <div className={`mfilters hf-filter-panel hfx-filters ${showMobileFilters ? 'mobile-open' : ''} ${showFilters ? '' : 'is-hidden'}`} data-filter-title={T('filters')} role="dialog" aria-label={T('filters')}>
-          <div className="hfx-filters-head"><b>{T('filters')}</b><div><button type="button" className="hfx-link" onClick={resetAllFilters}>{T('resetFilters')}</button><button type="button" className="hfx-icon-btn" aria-label="Close" onClick={() => { setShowFilters(false); setShowMobileFilters(false); }}>×</button></div></div>
-          <button className="mfilter-close" onClick={() => { setShowMobileFilters(false); setShowFilters(false); }} style={{ display:'none', background:theme.input, border:'1px solid '+theme.border, color:theme.text, cursor:'pointer' }}>×</button>
-          <div className="mfilter-grid hf-filter-grid">
-            <div className="mfilter-section hf-filter-section">
-              <div className="hf-filter-title">{T('calendarType')}</div>
-              <div className="mquick" style={{display:'flex',gap:8,flexWrap:'wrap'}}>
-                {[[ 'statement', T('amexPeriod') ], [ 'calendar', T('calendar') ]].map(([mode,label]) => <button className="mpill" key={mode} onClick={()=>setViewMode(mode)} style={{background:viewMode===mode?theme.accent:theme.input,border:'1px solid '+(viewMode===mode?theme.accent:theme.border),color:viewMode===mode?'#fff':theme.text,borderRadius:999,padding:'10px 14px',fontWeight:900,cursor:'pointer',whiteSpace:'nowrap'}}>{label}</button>)}
-              </div>
+        <div className={`hfx-filters ${showFilters ? '' : 'is-hidden'}`} role="dialog" aria-modal="false" aria-label={T('filters')}>
+          <div className="hfx-sheet-grip hfx-mobile-only" aria-hidden="true" />
+          <div className="hfx-filters-head"><h2>{T('filters')}</h2><div><button type="button" className="hfx-link" onClick={resetAllFilters}>{T('resetFilters')}</button><button type="button" className="hfx-icon-btn" aria-label={T('close')} onClick={() => { setShowFilters(false); setShowMobileFilters(false); }}><Icon name="close" size={16} /></button></div></div>
+          <div className="hfx-frow">
+            <div className="hfx-flabel">{T('calendarType')}</div>
+            <div className="hfx-seg">
+              {[[ 'statement', T('amexPeriod') ], [ 'calendar', T('calendar') ]].map(([mode,label]) => <button type="button" key={mode} className={viewMode===mode ? 'is-active' : ''} aria-pressed={viewMode===mode} onClick={()=>setViewMode(mode)}>{label}</button>)}
             </div>
-
-            <div className="mfilter-section hf-filter-section">
-              <div className="hf-filter-title">{T('quickRange')}</div>
-              <div className="mquick" style={{display:'flex',gap:8,flexWrap:'wrap',alignItems:'center'}}>
-                {[
-                  ['ALL', T('quickAll'), applyAllPeriods],
-                  ['YTD', T('quickYtd'), applyYtd],
-                  ['LAST_1', T('quickLastMonth'), () => applyLastPeriods(1, 'LAST_1')],
-                  ['LAST_3', T('quickLast3'), () => applyLastPeriods(3, 'LAST_3')],
-                  ['LAST_6', T('quickLast6'), () => applyLastPeriods(6, 'LAST_6')],
-                  ['LAST_12', T('quickLast12'), () => applyLastPeriods(12, 'LAST_12')],
-                ].map(([key,label,fn]) => { const disabled = activeTab === 'trends' && key === 'ALL'; return <button className={key === 'LAST_3' || key === 'LAST_6' || key === 'LAST_12' ? 'mquick-hide mpill' : 'mpill'} key={key} onClick={disabled ? undefined : fn} disabled={disabled} style={{background:quickRange===key?theme.accentSoft:theme.input,border:'1px solid '+(quickRange===key?theme.accent:theme.border),color:disabled?theme.subtext:(quickRange===key?theme.accent:theme.text),borderRadius:12,padding:'9px 11px',fontWeight:900,cursor:disabled?'not-allowed':'pointer',opacity:disabled?0.45:1}}>{label}</button>; })}
-              </div>
+          </div>
+          <div className="hfx-frow">
+            <div className="hfx-flabel">{T('quickRange')}</div>
+            <div className="hfx-seg hfx-seg-wrap">
+              {[
+                ['ALL', T('quickAll'), applyAllPeriods],
+                ['YTD', T('quickYtd'), applyYtd],
+                ['LAST_1', T('quickLastMonth'), () => applyLastPeriods(1, 'LAST_1')],
+                ['LAST_3', T('quickLast3'), () => applyLastPeriods(3, 'LAST_3')],
+                ['LAST_6', T('quickLast6'), () => applyLastPeriods(6, 'LAST_6')],
+                ['LAST_12', T('quickLast12'), () => applyLastPeriods(12, 'LAST_12')],
+              ].map(([key,label,fn]) => { const disabled = activeTab === 'trends' && key === 'ALL'; return <button type="button" key={key} className={quickRange===key ? 'is-active' : ''} aria-pressed={quickRange===key} onClick={disabled ? undefined : fn} disabled={disabled}>{label}</button>; })}
             </div>
-
-            <div className="mfilter-section hf-filter-section">
-              <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:8,marginBottom:10}}>
-                <div className="hf-filter-title" style={{marginBottom:0}}>{T('customRange')}</div>
-                <button onClick={resetAllFilters} style={{background:'transparent',border:'none',color:theme.accent,fontWeight:900,cursor:'pointer',fontSize:12,padding:0}}>{T('resetFilters')}</button>
-              </div>
-              <div className="mrange" style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8}}>
-                <label style={{display:'grid',gap:5,fontSize:11,color:theme.subtext,fontWeight:900}}>
-                  {T('start')}
-                  <select value={customRangeStartValue} onChange={(e)=>setCustomRangeStart(e.target.value)} style={S.input}>
-                    {customRangeOptions.map((key)=><option key={key} value={key}>{periodDropdownLabel(key, viewMode, currentLang)}</option>)}
-                  </select>
-                </label>
-                <label style={{display:'grid',gap:5,fontSize:11,color:theme.subtext,fontWeight:900}}>
-                  {T('end')}
-                  <select value={customRangeEndValue} onChange={(e)=>setCustomRangeEnd(e.target.value)} style={S.input}>
-                    {customRangeOptions.map((key)=><option key={key} value={key}>{periodDropdownLabel(key, viewMode, currentLang)}</option>)}
-                  </select>
-                </label>
-              </div>
+          </div>
+          <div className="hfx-frow">
+            <div className="hfx-flabel">{T('customRange')}</div>
+            <div className="hfx-frange">
+              <label><span>{T('start')}</span>
+                <select className="hfx-input" value={customRangeStartValue} onChange={(e)=>setCustomRangeStart(e.target.value)}>
+                  {customRangeOptions.map((key)=><option key={key} value={key}>{periodDropdownLabel(key, viewMode, currentLang)}</option>)}
+                </select>
+              </label>
+              <label><span>{T('end')}</span>
+                <select className="hfx-input" value={customRangeEndValue} onChange={(e)=>setCustomRangeEnd(e.target.value)}>
+                  {customRangeOptions.map((key)=><option key={key} value={key}>{periodDropdownLabel(key, viewMode, currentLang)}</option>)}
+                </select>
+              </label>
             </div>
-            <div className="mfilter-section hf-filter-section mpersonal-filter-section" style={{gridColumn:'3',gridRow:'2'}}>
-              <div className="hf-filter-title">{T('personalFlag')}</div>
-              <div className="mshow-personal">
-                <button className="mpill" onClick={()=>setPersonalFlagFilters([])} style={{background:!personalFlagFilters.length?theme.accentSoft:theme.input,border:'1px solid '+(!personalFlagFilters.length?theme.accent:theme.border),color:!personalFlagFilters.length?theme.accent:theme.text,cursor:'pointer'}}>{T('all')}</button>
-                {[['personale', T('personalOnly')], ['comune', T('commonOnly')]].map(([key,label]) => <button className="mpill" key={key} onClick={()=>setPersonalFlagFilters((prev)=>toggleFilterValue(prev, key, ['personale','comune']))} style={{background:isFilterValueSelected(personalFlagFilters,key)?theme.accentSoft:theme.input,border:'1px solid '+(isFilterValueSelected(personalFlagFilters,key)?theme.accent:theme.border),color:isFilterValueSelected(personalFlagFilters,key)?theme.accent:theme.text,cursor:'pointer'}}>{label}</button>)}
-              </div>
+          </div>
+          <div className="hfx-frow">
+            <div className="hfx-flabel">{T('personalFlag')}</div>
+            <div className="hfx-seg">
+              <button type="button" className={!personalFlagFilters.length ? 'is-active' : ''} aria-pressed={!personalFlagFilters.length} onClick={()=>setPersonalFlagFilters([])}>{T('all')}</button>
+              {[['personale', T('personalOnly')], ['comune', T('commonOnly')]].map(([key,label]) => { const on = personalFlagFilters.length > 0 && isFilterValueSelected(personalFlagFilters,key); return <button type="button" key={key} className={on ? 'is-active' : ''} aria-pressed={on} onClick={()=>setPersonalFlagFilters((prev)=>toggleFilterValue(prev, key, ['personale','comune']))}>{label}</button>; })}
             </div>
-            <div className="mfilter-section hf-filter-section msource-filter-section" style={{gridColumn:'3',gridRow:'3'}}>
-              <div className="hf-filter-title">{T('source')}</div>
-              <div className="mshow-personal msource-options">
-                <button className="mpill" onClick={()=>setSourceFilters([])} style={{background:!sourceFilters.length?theme.accentSoft:theme.input,border:'1px solid '+(!sourceFilters.length?theme.accent:theme.border),color:!sourceFilters.length?theme.accent:theme.text,cursor:'pointer'}}>{T('all')}</button>
-                {sourceOptions.map((opt) => <button className="mpill" key={opt.key} onClick={()=>setSourceFilters((prev)=>toggleFilterValue(prev, opt.key, sourceFilterKeys))} style={{background:isFilterValueSelected(sourceFilters,opt.key)?theme.accentSoft:theme.input,border:'1px solid '+(isFilterValueSelected(sourceFilters,opt.key)?theme.accent:theme.border),color:isFilterValueSelected(sourceFilters,opt.key)?theme.accent:theme.text,cursor:'pointer'}}>{opt.label}</button>)}
-              </div>
+          </div>
+          <div className="hfx-frow">
+            <div className="hfx-flabel">{T('source')}</div>
+            <div className="hfx-chips">
+              <button type="button" className={`hfx-chip ${!sourceFilters.length ? 'is-active' : ''}`} aria-pressed={!sourceFilters.length} onClick={()=>setSourceFilters([])}>{T('all')}</button>
+              {sourceOptions.map((opt) => { const on = sourceFilters.length > 0 && isFilterValueSelected(sourceFilters,opt.key); return <button type="button" key={opt.key} className={`hfx-chip ${on ? 'is-active' : ''}`} aria-pressed={on} onClick={()=>setSourceFilters((prev)=>toggleFilterValue(prev, opt.key, sourceFilterKeys))}>{opt.label}</button>; })}
             </div>
-            <div className="mfilter-section hf-filter-section mcategory-filter-section" style={{gridColumn:'1 / span 2',gridRow:'2 / span 2'}}>
-              <div className="hf-filter-title">{T('category')}</div>
-              <div className="mshow-personal mcategory-options" style={{maxHeight:150,overflow:'auto'}}>
-                <button className="mpill" onClick={()=>setCategoryFilters((prev)=>toggleAllCategoryFilters(prev))} style={{background:isAllCategoriesActive(categoryFilters)?theme.accentSoft:theme.input,border:'1px solid '+(isAllCategoriesActive(categoryFilters)?theme.accent:theme.border),color:isAllCategoriesActive(categoryFilters)?theme.accent:theme.text,cursor:'pointer'}}>{T('allCategories')}</button>
-                {categoryFilterOptions.map((opt) => <button className="mpill" key={opt.key} onClick={()=>setCategoryFilters((prev)=>toggleCategoryFilterValue(prev, opt.key, categoryFilterKeys))} style={{background:isCategoryFilterValueSelected(categoryFilters,opt.key)?theme.accentSoft:theme.input,border:'1px solid '+(isCategoryFilterValueSelected(categoryFilters,opt.key)?theme.accent:theme.border),color:isCategoryFilterValueSelected(categoryFilters,opt.key)?theme.accent:theme.text,cursor:'pointer'}}>{opt.label}</button>)}
-              </div>
+          </div>
+          <div className="hfx-frow is-top">
+            <div className="hfx-flabel">{T('category')}</div>
+            <div className="hfx-chips">
+              <button type="button" className={`hfx-chip ${isAllCategoriesActive(categoryFilters) ? 'is-active' : ''}`} aria-pressed={isAllCategoriesActive(categoryFilters)} onClick={()=>setCategoryFilters((prev)=>toggleAllCategoryFilters(prev))}>{T('allCategories')}</button>
+              {categoryFilterOptions.map((opt) => { const on = !isAllCategoriesActive(categoryFilters) && isCategoryFilterValueSelected(categoryFilters,opt.key); const cfg = categoryConfig[opt.key]; return <button type="button" key={opt.key} className={`hfx-chip ${on ? 'is-active' : ''}`} aria-pressed={on} onClick={()=>setCategoryFilters((prev)=>toggleCategoryFilterValue(prev, opt.key, categoryFilterKeys))}>{cfg?.color && <span className="hfx-dot" style={{ background: cfg.color }} />}{cfg?.label || opt.key}</button>; })}
             </div>
           </div>
         </div>
@@ -4352,7 +4348,7 @@ export default function App() {
               <section className="hfx-panel">
                 <header className="hfx-panel-head"><h2>{T('byAccountSource')}</h2></header>
                 {overviewAccountRows.length ? <ol className="hfx-rank is-compact">
-                  {overviewAccountRows.map(([name, value]) => { const pct = cur.total ? Math.round(value / cur.total * 100) : 0; return <li key={name}><button type="button" onClick={() => openDataWithFilters({ source: name })}>
+                  {overviewAccountRows.map(([name, value]) => { const pct = cur.total ? Math.round(value / cur.total * 100) : 0; return <li key={name}><button type="button" onClick={() => openDataWithFilters({ source: overviewAccountSources[name] || name })}>
                     <span className="hfx-rank-name">{name}</span>
                     <span className="hfx-num hfx-rank-value">{fmtDec(value)}</span>
                     <span className="hfx-num hfx-rank-pct">{pct}%</span>
@@ -4364,8 +4360,8 @@ export default function App() {
                 <ol className="hfx-rank is-compact">
                   {Object.entries(cur.subs || {}).sort(([, a], [, b]) => b.total - a.total).slice(0, 8).map(([name, info]) => <li key={name}><button type="button" onClick={() => openDataWithFilters({ subscription: name })}>
                     <span className="hfx-rank-name">{name}</span>
-                    <span className="hfx-muted hfx-rank-pct">×{info.count}</span>
                     <span className="hfx-num hfx-rank-value">{fmtDec(info.total)}</span>
+                    <span className="hfx-num hfx-rank-pct">×{info.count}</span>
                   </button></li>)}
                 </ol>
               </section>}
@@ -4384,7 +4380,7 @@ export default function App() {
                   <XAxis dataKey="month" tick={{fill:theme.subtext,fontSize:11}} />
                   <YAxis tick={{fill:theme.subtext,fontSize:11}} tickFormatter={amountTick} />
                   <Tooltip formatter={(v)=>fmt(v)} contentStyle={chartTooltipStyle} labelStyle={{ color: theme.text }} itemStyle={{ color: theme.text }} />
-                  <Bar dataKey={T('income')} fill={theme.totalGreen || theme.accent} radius={[6,6,0,0]} />
+                  <Bar dataKey={T('income')} fill={theme.totalGreen || theme.accent} radius={[6,6,0,0]} isAnimationActive={false} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -4467,9 +4463,9 @@ export default function App() {
                 <XAxis dataKey="month" tick={{fill:theme.subtext,fontSize:11}} />
                 <YAxis tick={{fill:theme.subtext,fontSize:11}} tickFormatter={amountTick} />
                 <Tooltip formatter={(v)=>fmt(v)} contentStyle={chartTooltipStyle} labelStyle={{ color: theme.text }} itemStyle={{ color: theme.text }} />
-                <Line type="monotone" dataKey={T('income')} stroke={theme.totalGreen || '#22c55e'} strokeWidth={3} dot={{ r:3 }} />
-                <Line type="monotone" dataKey={T('expenseOut')} stroke="#ef4444" strokeWidth={3} dot={{ r:3 }} />
-                <Line type="monotone" dataKey={T('netCashflow')} stroke={theme.accentAlt || theme.accent} strokeWidth={3} dot={{ r:3 }} />
+                <Line type="monotone" dataKey={T('income')} stroke={theme.totalGreen || '#22c55e'} strokeWidth={3} dot={{ r:3 }} isAnimationActive={false} />
+                <Line type="monotone" dataKey={T('expenseOut')} stroke="#ef4444" strokeWidth={3} dot={{ r:3 }} isAnimationActive={false} />
+                <Line type="monotone" dataKey={T('netCashflow')} stroke={theme.accentAlt || theme.accent} strokeWidth={3} dot={{ r:3 }} isAnimationActive={false} />
               </LineChart>
             </ResponsiveContainer>
           </div>
