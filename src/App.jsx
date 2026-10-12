@@ -1850,6 +1850,7 @@ const LANGUAGE_OPTIONS = [{key:'en',label:'English'},{key:'it',label:'Italiano'}
 const EXTRA_I18N = {
   it: {
     close:'Chiudi',
+    skipToContent:'Vai al contenuto',
     selectRow:'Seleziona',
     newWorkspace:'Nuovo workspace',
     signupTitle:'Inizia caricando il tuo primo database',
@@ -1868,6 +1869,7 @@ const EXTRA_I18N = {
   },
   en: {
     close:'Close',
+    skipToContent:'Skip to content',
     selectRow:'Select',
     newWorkspace:'New workspace',
     signupTitle:'Start by uploading your first database',
@@ -2756,7 +2758,7 @@ function UserMenuModal({ store, currentUserId, theme, lang, onClose, embedded = 
         {section === 'profile' && <><div className="profile-section-title">{T('personalProfile')}</div><div className="profile-field-grid">
           <label><div className="profile-field-label">{T('displayedName')}</div><input style={input} value={form.name || ''} onChange={e=>update({name:e.target.value})} /></label>
           <label><div className="profile-field-label">{T('username')}</div><input style={{...input, opacity:0.78}} value={form.id || ''} readOnly /></label>
-        </div><div className="profile-divider"><div className="profile-section-title">{T('changePassword')}</div><div className="profile-field-grid"><input type="password" style={input} value={passwordA} onChange={e=>setPasswordA(e.target.value)} placeholder={T('newPassword')} /><input type="password" style={input} value={passwordB} onChange={e=>setPasswordB(e.target.value)} placeholder={T('confirmNewPassword')} /></div></div><div className="profile-actions"><button className="profile-primary-btn" onClick={()=>onSave(form,passwordA,passwordB)}>{T('saveProfile')}</button></div></>}
+        </div><div className="profile-divider"><div className="profile-section-title">{T('changePassword')}</div><div className="profile-field-grid"><input type="password" autoComplete="new-password" aria-label={T('newPassword')} style={input} value={passwordA} onChange={e=>setPasswordA(e.target.value)} placeholder={T('newPassword')} /><input type="password" autoComplete="new-password" aria-label={T('confirmNewPassword')} style={input} value={passwordB} onChange={e=>setPasswordB(e.target.value)} placeholder={T('confirmNewPassword')} /></div></div><div className="profile-actions"><button className="profile-primary-btn" onClick={()=>onSave(form,passwordA,passwordB)}>{T('saveProfile')}</button></div></>}
         {section === 'data' && <><div className="profile-section-title"><IconLabel icon="data">{T('dataImport')}</IconLabel></div><div className="profile-data-stack">
           <div className="profile-action-row profile-time-machine-row"><div className="profile-time-machine-controls"><input style={input} value={timeMachineName} onChange={(e)=>setTimeMachineName(e.target.value)} placeholder={T('timeMachineNamePlaceholder')} /><button className="profile-primary-btn" onClick={createTimeMachineBackup} disabled={timeMachineBusy}><Icon name="restore" /> {timeMachineBusy ? T('loading') : T('createBackup')}</button></div><div className="profile-action-copy"><b>{T('timeMachine')}</b><br/>{T('timeMachineHelp')}{timeMachineMsg ? <span className="profile-inline-status"> {timeMachineMsg}</span> : null}</div></div>
           <div className="profile-time-machine-list">{timeMachineBackups.length ? timeMachineBackups.map((backup)=><div key={backup.id} className="profile-time-machine-item"><div><div className="profile-time-machine-title">{backup.name}</div><div className="profile-history-meta">{formatImportTimestamp(backup.createdAt, uiLang)} · {(backup.summary?.transactions || 0)} {T('transactions')} · {(backup.summary?.rules || 0)} {T('rulesCount')} · {(backup.summary?.customCategories || 0)} {T('customCategoriesCount')} · {(backup.summary?.formats || 0)} {T('formatsCount')}</div></div><div className="profile-time-machine-actions"><button className="profile-secondary-btn" disabled={timeMachineBusy} onClick={()=>downloadTimeMachineBackup(backup)}>{T('download')}</button><button className="profile-secondary-btn" disabled={timeMachineBusy} onClick={()=>restoreTimeMachineBackup(backup)}>{T('restore')}</button><button className="hf-icon-danger-btn" disabled={timeMachineBusy} onClick={()=>deleteTimeMachineBackup(backup.id)}>{T('delete')}</button></div></div>) : <div className="profile-empty-state">{T('timeMachineEmpty')}</div>}</div>
@@ -2876,6 +2878,12 @@ export default function App() {
   const [showFilters, setShowFilters] = useState(false);
   const [showMore, setShowMore] = useState(false);
   const [expandedTxId, setExpandedTxId] = useState(null);
+  useEffect(() => {
+    if (!showFilters && !showMore) return undefined;
+    const onKey = (event) => { if (event.key === 'Escape') { setShowFilters(false); setShowMobileFilters(false); setShowMore(false); } };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [showFilters, showMore]);
   const [forecastExpanded, setForecastExpanded] = useState(false);
   const fileRef = useRef();
   const backupRef = useRef();
@@ -4151,6 +4159,7 @@ export default function App() {
   return (
     <>
     <div className="hf-app hfx" data-theme={theme.name}>
+      <a className="hfx-skip" href="#hfx-content">{T('skipToContent')}</a>
       <aside className="hfx-sidebar" aria-label={T('sections')}>
         <div className="hfx-brand"><img src="/logo.png" alt="" className="hfx-logo" /><span>homefin</span></div>
         <nav className="hfx-nav">
@@ -4158,7 +4167,7 @@ export default function App() {
         </nav>
         <div className="hfx-side-group">
           <div className="hfx-side-label">{T('household')}</div>
-          {members.map((m, idx) => <button key={m.id} type="button" className={`hfx-member ${selectedHolder === m.id ? 'is-active' : ''}`} onClick={() => setSelectedHolder(selectedHolder === m.id ? 'ALL' : m.id)}><span className="hfx-dot" style={{ background: memberColor(theme, idx) }} />{m.name}</button>)}
+          {members.map((m, idx) => <button key={m.id} type="button" className={`hfx-member ${selectedHolder === m.id ? 'is-active' : ''}`} aria-pressed={selectedHolder === m.id} onClick={() => setSelectedHolder(selectedHolder === m.id ? 'ALL' : m.id)}><span className="hfx-dot" style={{ background: memberColor(theme, idx) }} />{m.name}</button>)}
         </div>
         <div className="hfx-side-foot">
           <button type="button" className={`hfx-nav-item ${activeTab === 'profile' ? 'is-active' : ''}`} data-tab-id="profile" onClick={() => goTab('profile')}><Icon name="customization" size={16} /><span>{T('profile')}</span></button>
@@ -4189,13 +4198,13 @@ export default function App() {
             <div className="hfx-seg hfx-desktop-only" role="group" aria-label={T('quickRange')}>
               {quickRangeOptions.map(([key, label, fn]) => { const disabled = activeTab === 'trends' && key === 'ALL'; return <button key={key} type="button" className={quickRange === key ? 'is-active' : ''} aria-pressed={quickRange === key} disabled={disabled} onClick={disabled ? undefined : fn}>{label}</button>; })}
             </div>
-            <button type="button" className={`hfx-btn ${showFilters ? 'is-active' : ''}`} onClick={() => { setShowFilters((v) => !v); setShowMobileFilters(true); }} aria-expanded={showFilters}><Icon name="filters" size={15} /><span>{T('filters')}</span>{activeFilterCount > 0 && <span className="hfx-badge">{activeFilterCount}</span>}</button>
+            <button type="button" className={`hfx-btn ${showFilters ? 'is-active' : ''}`} onClick={() => { setShowFilters((v) => !v); setShowMobileFilters(true); }} aria-expanded={showFilters} aria-haspopup="dialog" aria-controls="hfx-filters"><Icon name="filters" size={15} /><span>{T('filters')}</span>{activeFilterCount > 0 && <span className="hfx-badge">{activeFilterCount}</span>}</button>
           </div>}
         </header>
 
         {uploadMsg && (() => { const tone = /^\s*❌/.test(uploadMsg) ? 'is-error' : /^\s*✅/.test(uploadMsg) ? 'is-success' : ''; const text = String(uploadMsg).replace(/^\s*(?:✅|❌|📖)\s*/u, '').replace(/⚠️\s*/gu, ''); return <div className={`hf-toast hfx-toast ${tone}`} role={tone === 'is-error' ? 'alert' : 'status'}><span className="hfx-toast-dot" aria-hidden="true" /><span>{text}</span><button type="button" onClick={()=>setUploadMsg('')} aria-label={T('close')} className="hfx-toast-close"><Icon name="close" size={14} /></button></div>; })()}
 
-      {showUserMenu ? <UserMenuModal store={store} currentUserId={currentUserId} theme={theme} lang={currentLang} onClose={() => setShowUserMenu(false)} onSave={saveUserProfile} inputStyle={S.input} onRefresh={refresh} syncing={syncing} onImportExcel={() => fileRef.current?.click()} uploading={uploading} onExportData={exportData} onImportBackup={() => backupRef.current?.click()} importSourceId={importSourceId} onImportSourceChange={(id)=>{ setImportSourceId(id); lsSet(LS.importSource, id); }} importAccountId={importAccountId} onImportAccountChange={(id)=>{ setImportAccountId(id); lsSet(LS.importAccount, id); }} onSaveHousehold={saveHousehold} onSaveFormat={saveCustomFormat} onDeleteFormat={deleteCustomFormat} onSaveFormatAndImport={saveFormatAndImport} onSavePersonalization={savePersonalization} onDeleteCategory={deleteCategorySafe} onSaveUsers={saveUsers} onLogout={logout} onOpenRawData={(filters)=>{ setShowUserMenu(false); filters ? openDataWithFilters(filters) : setActiveTab('raw'); }} onSaveStore={saveStore} onTimeMachineRestored={(next)=>setStore(next)} onApplyRulesRetroactively={applyRetro} /> : <div className="mc hf-content">
+      {showUserMenu ? <UserMenuModal store={store} currentUserId={currentUserId} theme={theme} lang={currentLang} onClose={() => setShowUserMenu(false)} onSave={saveUserProfile} inputStyle={S.input} onRefresh={refresh} syncing={syncing} onImportExcel={() => fileRef.current?.click()} uploading={uploading} onExportData={exportData} onImportBackup={() => backupRef.current?.click()} importSourceId={importSourceId} onImportSourceChange={(id)=>{ setImportSourceId(id); lsSet(LS.importSource, id); }} importAccountId={importAccountId} onImportAccountChange={(id)=>{ setImportAccountId(id); lsSet(LS.importAccount, id); }} onSaveHousehold={saveHousehold} onSaveFormat={saveCustomFormat} onDeleteFormat={deleteCustomFormat} onSaveFormatAndImport={saveFormatAndImport} onSavePersonalization={savePersonalization} onDeleteCategory={deleteCategorySafe} onSaveUsers={saveUsers} onLogout={logout} onOpenRawData={(filters)=>{ setShowUserMenu(false); filters ? openDataWithFilters(filters) : setActiveTab('raw'); }} onSaveStore={saveStore} onTimeMachineRestored={(next)=>setStore(next)} onApplyRulesRetroactively={applyRetro} /> : <div id="hfx-content" className="mc hf-content" tabIndex={-1}>
         {activeTab !== 'profile' && <>
         {activeTab !== 'overview' && <div className="hfx-strip">
           {(activeTab === 'income'
@@ -4209,7 +4218,7 @@ export default function App() {
         </div>}
 
         {showFilters && <div className="hfx-scrim" onClick={() => { setShowFilters(false); setShowMobileFilters(false); }} />}
-        <div className={`hfx-filters ${showFilters ? '' : 'is-hidden'}`} role="dialog" aria-modal="false" aria-label={T('filters')}>
+        <div id="hfx-filters" className={`hfx-filters ${showFilters ? '' : 'is-hidden'}`} role="dialog" aria-modal="false" aria-label={T('filters')}>
           <div className="hfx-sheet-grip hfx-mobile-only" aria-hidden="true" />
           <div className="hfx-filters-head"><h2>{T('filters')}</h2><div><button type="button" className="hfx-link" onClick={resetAllFilters}>{T('resetFilters')}</button><button type="button" className="hfx-icon-btn" aria-label={T('close')} onClick={() => { setShowFilters(false); setShowMobileFilters(false); }}><Icon name="close" size={16} /></button></div></div>
           <div className="hfx-frow">
@@ -4540,36 +4549,36 @@ export default function App() {
             <table className="hf-data-table hf-raw-data-table">
               <thead>
                 <tr className="hf-data-head-row">
-                  <th style={{ width:42 }}><input type="checkbox" checked={renderedRawRows.length > 0 && renderedRawRows.every((r)=>selectedRawSet.has(r.id))} onChange={toggleSelectVisibleRawRows} title={T('selectVisible')} /></th>
+                  <th style={{ width:42 }}><input type="checkbox" checked={renderedRawRows.length > 0 && renderedRawRows.every((r)=>selectedRawSet.has(r.id))} onChange={toggleSelectVisibleRawRows} title={T('selectVisible')} aria-label={T('selectVisible')} /></th>
                   {[[T('date'),'date'],[T('description'),'desc'],[T('holder'),'holder'],[T('source'),'source'],[T('country'),'paese'],[T('amount'),'amount'],[T('category'),'category'],[T('flag'),'personalFlag'],[T('cashflow'),'cashflow']].map(([col,key]) => <th key={key}>{rawHeader(col, key)}</th>)}
                 </tr>
                 <tr className="hf-data-filter-row">
                   <th><button className="hf-sort-button" onClick={()=>setSelectedRawIds([])}>{T('clear')}</button></th>
-                  <th><input value={rawDraftFilters.date} onChange={(e)=>updateRawDraftFilter('date', e.target.value)} onKeyDown={handleRawFilterKeyDown} placeholder={T('filter')} style={rawFilterInputStyle('date')} /></th>
-                  <th><input value={rawDraftFilters.desc} onChange={(e)=>updateRawDraftFilter('desc', e.target.value)} onKeyDown={handleRawFilterKeyDown} placeholder={T('merchantDesc')} style={rawFilterInputStyle('desc')} /></th>
-                  <th><input value={rawDraftFilters.holder} onChange={(e)=>updateRawDraftFilter('holder', e.target.value)} onKeyDown={handleRawFilterKeyDown} placeholder={T('holder')} style={rawFilterInputStyle('holder')} /></th>
-                  <th><input value={rawDraftFilters.source} onChange={(e)=>updateRawDraftFilter('source', e.target.value)} onKeyDown={handleRawFilterKeyDown} placeholder={T('source')} style={rawFilterInputStyle('source')} /></th>
-                  <th><input value={rawDraftFilters.paese} onChange={(e)=>updateRawDraftFilter('paese', e.target.value)} onKeyDown={handleRawFilterKeyDown} placeholder={T('country')} style={rawFilterInputStyle('paese')} /></th>
-                  <th><div className="hf-data-amount-filter"><input value={rawDraftFilters.amountMin} onChange={(e)=>updateRawDraftFilter('amountMin', e.target.value)} onKeyDown={handleRawFilterKeyDown} placeholder={T('min')} style={rawAmountFilterStyle} /><input value={rawDraftFilters.amountMax} onChange={(e)=>updateRawDraftFilter('amountMax', e.target.value)} onKeyDown={handleRawFilterKeyDown} placeholder={T('max')} style={rawAmountFilterStyle} /></div></th>
-                  <th><input value={rawDraftFilters.category} onChange={(e)=>updateRawDraftFilter('category', e.target.value)} onKeyDown={handleRawFilterKeyDown} placeholder={T('category')} style={rawFilterInputStyle('category')} /></th>
-                  <th><input value={rawDraftFilters.personalFlag} onChange={(e)=>updateRawDraftFilter('personalFlag', e.target.value)} onKeyDown={handleRawFilterKeyDown} placeholder={T('personalFlag')} style={rawFilterInputStyle('personalFlag')} /></th>
-                  <th><input value={rawDraftFilters.cashflow} onChange={(e)=>updateRawDraftFilter('cashflow', e.target.value)} onKeyDown={handleRawFilterKeyDown} placeholder={T('cashflow')} style={rawFilterInputStyle('cashflow')} /></th>
+                  <th><input value={rawDraftFilters.date} onChange={(e)=>updateRawDraftFilter('date', e.target.value)} onKeyDown={handleRawFilterKeyDown} aria-label={T('filter')} placeholder={T('filter')} style={rawFilterInputStyle('date')} /></th>
+                  <th><input value={rawDraftFilters.desc} onChange={(e)=>updateRawDraftFilter('desc', e.target.value)} onKeyDown={handleRawFilterKeyDown} aria-label={T('merchantDesc')} placeholder={T('merchantDesc')} style={rawFilterInputStyle('desc')} /></th>
+                  <th><input value={rawDraftFilters.holder} onChange={(e)=>updateRawDraftFilter('holder', e.target.value)} onKeyDown={handleRawFilterKeyDown} aria-label={T('holder')} placeholder={T('holder')} style={rawFilterInputStyle('holder')} /></th>
+                  <th><input value={rawDraftFilters.source} onChange={(e)=>updateRawDraftFilter('source', e.target.value)} onKeyDown={handleRawFilterKeyDown} aria-label={T('source')} placeholder={T('source')} style={rawFilterInputStyle('source')} /></th>
+                  <th><input value={rawDraftFilters.paese} onChange={(e)=>updateRawDraftFilter('paese', e.target.value)} onKeyDown={handleRawFilterKeyDown} aria-label={T('country')} placeholder={T('country')} style={rawFilterInputStyle('paese')} /></th>
+                  <th><div className="hf-data-amount-filter"><input value={rawDraftFilters.amountMin} onChange={(e)=>updateRawDraftFilter('amountMin', e.target.value)} onKeyDown={handleRawFilterKeyDown} aria-label={T('min')} placeholder={T('min')} style={rawAmountFilterStyle} /><input value={rawDraftFilters.amountMax} onChange={(e)=>updateRawDraftFilter('amountMax', e.target.value)} onKeyDown={handleRawFilterKeyDown} aria-label={T('max')} placeholder={T('max')} style={rawAmountFilterStyle} /></div></th>
+                  <th><input value={rawDraftFilters.category} onChange={(e)=>updateRawDraftFilter('category', e.target.value)} onKeyDown={handleRawFilterKeyDown} aria-label={T('category')} placeholder={T('category')} style={rawFilterInputStyle('category')} /></th>
+                  <th><input value={rawDraftFilters.personalFlag} onChange={(e)=>updateRawDraftFilter('personalFlag', e.target.value)} onKeyDown={handleRawFilterKeyDown} aria-label={T('personalFlag')} placeholder={T('personalFlag')} style={rawFilterInputStyle('personalFlag')} /></th>
+                  <th><input value={rawDraftFilters.cashflow} onChange={(e)=>updateRawDraftFilter('cashflow', e.target.value)} onKeyDown={handleRawFilterKeyDown} aria-label={T('cashflow')} placeholder={T('cashflow')} style={rawFilterInputStyle('cashflow')} /></th>
                 </tr>
               </thead>
               <tbody>
                 {rawVirtualWindow.topPad > 0 && <tr aria-hidden="true"><td colSpan={10} style={{ height: rawVirtualWindow.topPad, padding:0, border:0 }} /></tr>}
                 {rawVirtualWindow.rows.map((row) => (
                   <tr key={row.id} className={`hf-data-row ${selectedRawSet.has(row.id) ? 'is-selected' : ''}`}>
-                    <td><input type="checkbox" checked={selectedRawSet.has(row.id)} onChange={()=>toggleRawRowSelection(row.id)} /></td>
+                    <td><input type="checkbox" aria-label={`${T('selectRow')}: ${row.desc}`} checked={selectedRawSet.has(row.id)} onChange={()=>toggleRawRowSelection(row.id)} /></td>
                     <td>{row.date}</td>
                     <td><div className="hf-data-desc">{row.desc}</div></td>
-                    <td><select className="hf-data-select-holder" value={canonicalHolderDisplay(row.holder)} onChange={(e)=>overrideHolder(row, e.target.value)} style={S.input}>{holderOptions.map((h)=><option key={h} value={h}>{h}</option>)}</select></td>
+                    <td><select className="hf-data-select-holder" aria-label={`${T('holder')}: ${row.desc}`} value={canonicalHolderDisplay(row.holder)} onChange={(e)=>overrideHolder(row, e.target.value)} style={S.input}>{holderOptions.map((h)=><option key={h} value={h}>{h}</option>)}</select></td>
                     <td className="hf-data-muted hf-data-strong">{row.sourceLabel}</td>
                     <td className="hf-data-muted hfx-td-country">{row.paese || '—'}</td>
                     <td className="hf-data-strong hfx-num hfx-td-amount">{row.amountLabel}</td>
-                    <td><select className="hf-data-select-category" value={row.categoryKey} onChange={(e)=>handleRawCategoryChange(row, e.target.value)} style={{ ...S.input, '--cat': categoryConfig[row.categoryKey]?.color || theme.subtext }}>{Object.entries(categoryConfig).map(([key, cfg]) => <option key={key} value={key}>{cfg.label}</option>)}<option value="__new_category__">{T('newCategory')}</option></select></td>
-                    <td><select className="hf-data-select-flag" value={row.personalFlag} onChange={(e)=>overridePersonalFlag(row, e.target.value)} style={S.input}><option value="comune">{T('common')}</option><option value="personale">{T('personal')}</option></select></td>
-                    <td><select className={`hf-cashflow-select is-${row.cashflowType}`} value={row.cashflowType} onChange={(e)=>overrideCashflowExclusion(row, e.target.value)} style={S.input}><option value="expense">{T('cashflowExpense')}</option><option value="income">{T('cashflowIncome')}</option><option value="excluded">{T('cashflowExcluded')}</option></select>{row.isRefund && row.cashflowType === 'expense' ? <div className="hf-data-refund">{T('refund')}</div> : null}</td>
+                    <td><select className="hf-data-select-category" aria-label={`${T('category')}: ${row.desc}`} value={row.categoryKey} onChange={(e)=>handleRawCategoryChange(row, e.target.value)} style={{ ...S.input, '--cat': categoryConfig[row.categoryKey]?.color || theme.subtext }}>{Object.entries(categoryConfig).map(([key, cfg]) => <option key={key} value={key}>{cfg.label}</option>)}<option value="__new_category__">{T('newCategory')}</option></select></td>
+                    <td><select className="hf-data-select-flag" aria-label={`${T('flag')}: ${row.desc}`} value={row.personalFlag} onChange={(e)=>overridePersonalFlag(row, e.target.value)} style={S.input}><option value="comune">{T('common')}</option><option value="personale">{T('personal')}</option></select></td>
+                    <td><select className={`hf-cashflow-select is-${row.cashflowType}`} aria-label={`${T('cashflow')}: ${row.desc}`} value={row.cashflowType} onChange={(e)=>overrideCashflowExclusion(row, e.target.value)} style={S.input}><option value="expense">{T('cashflowExpense')}</option><option value="income">{T('cashflowIncome')}</option><option value="excluded">{T('cashflowExcluded')}</option></select>{row.isRefund && row.cashflowType === 'expense' ? <div className="hf-data-refund">{T('refund')}</div> : null}</td>
                   </tr>
                 ))}
                 {rawVirtualWindow.bottomPad > 0 && <tr aria-hidden="true"><td colSpan={10} style={{ height: rawVirtualWindow.bottomPad, padding:0, border:0 }} /></tr>}
@@ -4626,7 +4635,7 @@ export default function App() {
                 <td className="hf-note-amount">{fmtDec(row.sharedSpend)}</td>
                 <td className="hf-note-amount">{fmtDec(row.personalSpend)}</td>
                 <td className="hf-note-amount is-income">{fmtDec(row.income)}</td>
-                <td><textarea className="hf-note-textarea" defaultValue={row.note} onBlur={(e)=>updateNote(row.noteKey,{note:e.target.value})} placeholder={T('notesText')} style={S.input} /></td>
+                <td><textarea className="hf-note-textarea" aria-label={`${T('notesText')} · ${row.month} · ${row.user}`} defaultValue={row.note} onBlur={(e)=>updateNote(row.noteKey,{note:e.target.value})} placeholder={T('notesText')} style={S.input} /></td>
               </tr>)}</tbody>
             </table>
           </div>
@@ -4637,12 +4646,12 @@ export default function App() {
 
       <nav className="hfx-tabbar" aria-label={T('sections')}>
         {mobileTabs.map(([id, label, icon]) => <button key={id} type="button" className={activeTab === id ? 'is-active' : ''} aria-current={activeTab === id ? 'page' : undefined} onClick={() => goTab(id)}><Icon name={icon} size={20} /><span>{label}</span></button>)}
-        <button type="button" className={showMore || ['notes','profile'].includes(activeTab) ? 'is-active' : ''} onClick={() => setShowMore(true)}><Icon name="more" size={20} /><span>{T('more')}</span></button>
+        <button type="button" className={showMore || ['notes','profile'].includes(activeTab) ? 'is-active' : ''} aria-haspopup="dialog" aria-expanded={showMore} aria-controls="hfx-more" onClick={() => setShowMore(true)}><Icon name="more" size={20} /><span>{T('more')}</span></button>
       </nav>
       {showMore && <>
         <div className="hfx-scrim is-mobile" onClick={() => setShowMore(false)} />
-        <div className="hfx-sheet" role="dialog" aria-label={T('more')}>
-          <div className="hfx-sheet-grip" />
+        <div id="hfx-more" className="hfx-sheet" role="dialog" aria-modal="true" aria-label={T('more')}>
+          <div className="hfx-sheet-grip" aria-hidden="true" />
           {[['notes', T('notesTab'), 'notes'], ['profile', T('profile'), 'customization']].map(([id, label, icon]) => <button key={id} type="button" className="hfx-sheet-item" onClick={() => { goTab(id); setShowMore(false); }}><Icon name={icon} size={18} /><span>{label}</span></button>)}
           <div className="hfx-sheet-sep" />
           <div className="hfx-sheet-label">{T('user')}</div>
