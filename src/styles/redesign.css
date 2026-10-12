@@ -167,8 +167,8 @@
 .hfx .hf-compact-table select, .hfx .hf-compact-table input:not([type="checkbox"]) { padding: 6px 8px !important; border: 1px solid var(--x-field) !important; border-radius: 6px !important; background: var(--x-bg) !important; color: var(--x-text) !important; font-size: 12.5px !important; font-weight: 400 !important; box-shadow: none !important; }
 .hfx .hf-note-textarea { min-height: 36px; resize: vertical; }
 .hfx .hf-note-month, .hfx .hf-note-user { font-weight: 500; white-space: nowrap; }
-.hfx .hf-note-amount { font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
-.hfx .hf-note-amount.is-income { color: var(--x-pos); }
+.hfx .hf-note-amount { color: var(--x-text) !important; font-weight: 500 !important; font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+.hfx .hf-note-amount.is-income { color: var(--x-text-2) !important; }
 .hfx .hf-income-table { min-width: 860px !important; }
 .hfx .hf-income-table th { padding: 8px 10px !important; color: var(--x-text-3); font-size: 11.5px; font-weight: 500; background: var(--x-surface); }
 .hfx .hf-income-table td { padding: 8px 10px !important; font-size: 13px; border-color: var(--x-line) !important; }
