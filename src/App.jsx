@@ -1552,6 +1552,17 @@ function Icon({ name, className = '', size = 18, strokeWidth = 2, title }) {
   );
 }
 
+function CatIcon({ cfg, size = 'sm' }) {
+  return <span className={`hfx-cat-icon is-${size}`} style={{ '--cat': cfg?.color || '#888' }} aria-hidden="true">{cfg?.icon || '🏷️'}</span>;
+}
+
+const RAW_COL_KEYS = ['select', 'date', 'desc', 'holder', 'source', 'paese', 'amount', 'category', 'personalFlag', 'cashflow'];
+const RAW_COL_DEFAULTS = { select: 40, date: 100, desc: 320, holder: 112, source: 76, paese: 80, amount: 128, category: 196, personalFlag: 124, cashflow: 116 };
+const RAW_COL_STORAGE_KEY = 'hf_raw_col_widths';
+function loadRawColWidths() {
+  try { const saved = JSON.parse(lsGet(RAW_COL_STORAGE_KEY) || '{}'); return { ...RAW_COL_DEFAULTS, ...Object.fromEntries(Object.entries(saved).filter(([k, v]) => k in RAW_COL_DEFAULTS && Number(v) >= 40)) }; } catch { return { ...RAW_COL_DEFAULTS }; }
+}
+
 function IconLabel({ icon, children, className = '' }) {
   return <span className={`hf-icon-label ${className}`.trim()}><Icon name={icon} /><span>{children}</span></span>;
 }
@@ -1887,7 +1898,7 @@ const EXTRA_I18N = {
   it: {
     close:'Chiudi',
     skipToContent:'Vai al contenuto',
-    selectRow:'Seleziona',
+    selectRow:'Seleziona', resizeColumn:'Ridimensiona colonna', resizeColumnHint:'Trascina per ridimensionare, doppio clic per ripristinare',
     newWorkspace:'Nuovo workspace',
     signupTitle:'Inizia caricando il tuo primo database',
     signupHelp:'Carica un estratto Excel Amex oppure un backup JSON di homefin.',
@@ -1906,7 +1917,7 @@ const EXTRA_I18N = {
   en: {
     close:'Close',
     skipToContent:'Skip to content',
-    selectRow:'Select',
+    selectRow:'Select', resizeColumn:'Resize column', resizeColumnHint:'Drag to resize, double-click to reset',
     newWorkspace:'New workspace',
     signupTitle:'Start by uploading your first database',
     signupHelp:'Upload an Amex Excel statement or a homefin JSON backup.',
@@ -2916,6 +2927,18 @@ export default function App() {
   const [showFilters, setShowFilters] = useState(false);
   const [showMore, setShowMore] = useState(false);
   const [expandedTxId, setExpandedTxId] = useState(null);
+  const [rawColWidths, setRawColWidths] = useState(loadRawColWidths);
+  const startRawColResize = (key, event) => {
+    event.preventDefault(); event.stopPropagation();
+    const startX = event.clientX; const startW = rawColWidths[key];
+    let latest = rawColWidths;
+    const move = (e) => { latest = { ...latest, [key]: Math.max(48, Math.round(startW + e.clientX - startX)) }; setRawColWidths(latest); };
+    const up = () => { window.removeEventListener('pointermove', move); window.removeEventListener('pointerup', up); document.body.classList.remove('hfx-col-resizing'); lsSet(RAW_COL_STORAGE_KEY, JSON.stringify(latest)); };
+    document.body.classList.add('hfx-col-resizing');
+    window.addEventListener('pointermove', move); window.addEventListener('pointerup', up);
+  };
+  const resetRawColWidth = (key) => { const next = { ...rawColWidths, [key]: RAW_COL_DEFAULTS[key] }; setRawColWidths(next); lsSet(RAW_COL_STORAGE_KEY, JSON.stringify(next)); };
+  const rawColResizer = (key, label) => <span className="hfx-col-resizer" role="separator" aria-orientation="vertical" aria-label={`${T('resizeColumn')}: ${label}`} title={T('resizeColumnHint')} onPointerDown={(e)=>startRawColResize(key, e)} onDoubleClick={()=>resetRawColWidth(key)} onClick={(e)=>e.stopPropagation()} />;
   useEffect(() => {
     if (!showFilters && !showMore) return undefined;
     const onKey = (event) => { if (event.key === 'Escape') { setShowFilters(false); setShowMobileFilters(false); setShowMore(false); } };
@@ -4311,7 +4334,7 @@ export default function App() {
             <div className="hfx-flabel">{T('category')}</div>
             <div className="hfx-chips">
               <button type="button" className={`hfx-chip ${isAllCategoriesActive(categoryFilters) ? 'is-active' : ''}`} aria-pressed={isAllCategoriesActive(categoryFilters)} onClick={()=>setCategoryFilters((prev)=>toggleAllCategoryFilters(prev))}>{T('allCategories')}</button>
-              {categoryFilterOptions.map((opt) => { const on = !isAllCategoriesActive(categoryFilters) && isCategoryFilterValueSelected(categoryFilters,opt.key); const cfg = categoryConfig[opt.key]; return <button type="button" key={opt.key} className={`hfx-chip ${on ? 'is-active' : ''}`} aria-pressed={on} onClick={()=>setCategoryFilters((prev)=>toggleCategoryFilterValue(prev, opt.key, categoryFilterKeys))}>{cfg?.color && <span className="hfx-dot" style={{ background: cfg.color }} />}{cfg?.label || opt.key}</button>; })}
+              {categoryFilterOptions.map((opt) => { const on = !isAllCategoriesActive(categoryFilters) && isCategoryFilterValueSelected(categoryFilters,opt.key); const cfg = categoryConfig[opt.key]; return <button type="button" key={opt.key} className={`hfx-chip ${on ? 'is-active' : ''}`} aria-pressed={on} onClick={()=>setCategoryFilters((prev)=>toggleCategoryFilterValue(prev, opt.key, categoryFilterKeys))}>{cfg && <CatIcon cfg={cfg} />}{cfg?.label || opt.key}</button>; })}
             </div>
           </div>
         </div>
@@ -4387,7 +4410,7 @@ export default function App() {
               </header>
               <ol className="hfx-rank">
                 {topCategoryRows.map(([k, v]) => { const cfg = categoryConfig[k] || { label: k, color: '#888' }; const pct = cur.total ? Math.round(v / cur.total * 100) : 0; return <li key={k}><button type="button" onClick={() => openDataWithFilters({ category: k })}>
-                  <span className="hfx-rank-name"><span className="hfx-dot" style={{ background: cfg.color }} />{cfg.label}</span>
+                  <span className="hfx-rank-name"><CatIcon cfg={cfg} />{cfg.label}</span>
                   <span className="hfx-rank-bar" aria-hidden="true"><i style={{ width: `${Math.max(pct, 1)}%`, background: cfg.color }} /></span>
                   <span className="hfx-num hfx-rank-value">{fmtDec(v)}</span>
                   <span className="hfx-num hfx-rank-pct">{pct}%</span>
@@ -4584,11 +4607,12 @@ export default function App() {
           {rawFilteredRowsLimited && <div className="hf-data-notice is-muted"><span>{T('filteredRowsNotice').replace('{shown}', renderedRawRows.length).replace('{total}', sortedScopedRawRows.length)}</span><button className="profile-secondary-btn" onClick={()=>setRawFilteredRenderLimit(sortedScopedRawRows.length)}>{T('showAll')}</button></div>}
           <section className="hfx-panel hfx-table-panel hfx-desktop-only">
           <div className="hf-table-wrap hfx-table-wrap" onScroll={(event)=>setRawVirtualScrollTop(event.currentTarget.scrollTop)}>
-            <table className="hf-data-table hf-raw-data-table">
+            <table className="hf-data-table hf-raw-data-table" style={{ width: RAW_COL_KEYS.reduce((sum, key) => sum + rawColWidths[key], 0) }}>
+              <colgroup>{RAW_COL_KEYS.map((key) => <col key={key} style={{ width: rawColWidths[key] }} />)}</colgroup>
               <thead>
                 <tr className="hf-data-head-row">
-                  <th style={{ width:42 }}><input type="checkbox" checked={renderedRawRows.length > 0 && renderedRawRows.every((r)=>selectedRawSet.has(r.id))} onChange={toggleSelectVisibleRawRows} title={T('selectVisible')} aria-label={T('selectVisible')} /></th>
-                  {[[T('date'),'date'],[T('description'),'desc'],[T('holder'),'holder'],[T('source'),'source'],[T('country'),'paese'],[T('amount'),'amount'],[T('category'),'category'],[T('flag'),'personalFlag'],[T('cashflow'),'cashflow']].map(([col,key]) => <th key={key}>{rawHeader(col, key)}</th>)}
+                  <th><input type="checkbox" checked={renderedRawRows.length > 0 && renderedRawRows.every((r)=>selectedRawSet.has(r.id))} onChange={toggleSelectVisibleRawRows} title={T('selectVisible')} aria-label={T('selectVisible')} /></th>
+                  {[[T('date'),'date'],[T('description'),'desc'],[T('holder'),'holder'],[T('source'),'source'],[T('country'),'paese'],[T('amount'),'amount'],[T('category'),'category'],[T('flag'),'personalFlag'],[T('cashflow'),'cashflow']].map(([col,key]) => <th key={key} className="hfx-resizable-th">{rawHeader(col, key)}{rawColResizer(key, col)}</th>)}
                 </tr>
                 <tr className="hf-data-filter-row">
                   <th><button className="hf-sort-button" onClick={()=>setSelectedRawIds([])}>{T('clear')}</button></th>
@@ -4609,12 +4633,12 @@ export default function App() {
                   <tr key={row.id} className={`hf-data-row ${selectedRawSet.has(row.id) ? 'is-selected' : ''}`}>
                     <td><input type="checkbox" aria-label={`${T('selectRow')}: ${row.desc}`} checked={selectedRawSet.has(row.id)} onChange={()=>toggleRawRowSelection(row.id)} /></td>
                     <td>{row.date}</td>
-                    <td><div className="hf-data-desc">{row.desc}</div></td>
+                    <td><div className="hf-data-desc" title={row.desc}>{row.desc}</div></td>
                     <td><select className="hf-data-select-holder" aria-label={`${T('holder')}: ${row.desc}`} value={canonicalHolderDisplay(row.holder)} onChange={(e)=>overrideHolder(row, e.target.value)} style={S.input}>{holderOptions.map((h)=><option key={h} value={h}>{h}</option>)}</select></td>
                     <td className="hf-data-muted hf-data-strong">{row.sourceLabel}</td>
                     <td className="hf-data-muted hfx-td-country">{row.paese || '—'}</td>
                     <td className="hf-data-strong hfx-num hfx-td-amount">{row.amountLabel}</td>
-                    <td><select className="hf-data-select-category" aria-label={`${T('category')}: ${row.desc}`} value={row.categoryKey} onChange={(e)=>handleRawCategoryChange(row, e.target.value)} style={{ ...S.input, '--cat': categoryConfig[row.categoryKey]?.color || theme.subtext }}>{Object.entries(categoryConfig).map(([key, cfg]) => <option key={key} value={key}>{cfg.label}</option>)}<option value="__new_category__">{T('newCategory')}</option></select></td>
+                    <td><select className="hf-data-select-category" aria-label={`${T('category')}: ${row.desc}`} value={row.categoryKey} onChange={(e)=>handleRawCategoryChange(row, e.target.value)} style={S.input}>{Object.entries(categoryConfig).map(([key, cfg]) => <option key={key} value={key}>{cfg.icon || '🏷️'} {cfg.label}</option>)}<option value="__new_category__">{T('newCategory')}</option></select></td>
                     <td><select className="hf-data-select-flag" aria-label={`${T('flag')}: ${row.desc}`} value={row.personalFlag} onChange={(e)=>overridePersonalFlag(row, e.target.value)} style={S.input}><option value="comune">{T('common')}</option><option value="personale">{T('personal')}</option></select></td>
                     <td><select className={`hf-cashflow-select is-${row.cashflowType}`} aria-label={`${T('cashflow')}: ${row.desc}`} value={row.cashflowType} onChange={(e)=>overrideCashflowExclusion(row, e.target.value)} style={S.input}><option value="expense">{T('cashflowExpense')}</option><option value="income">{T('cashflowIncome')}</option><option value="excluded">{T('cashflowExcluded')}</option></select>{row.isRefund && row.cashflowType === 'expense' ? <div className="hf-data-refund">{T('refund')}</div> : null}</td>
                   </tr>
@@ -4641,16 +4665,17 @@ export default function App() {
                 <div className="hfx-txdate"><span>{dayLabel}</span>{dayTotal > 0 && <span className="hfx-num">{fmtDec(dayTotal)}</span>}</div>
                 <ul>{group.rows.map((row) => { const cfg = categoryConfig[row.categoryKey] || { label: row.categoryKey, color: theme.subtext }; const open = expandedTxId === row.id; return <li key={row.id} className={`${open ? 'is-open' : ''} ${selectedRawSet.has(row.id) ? 'is-selected' : ''}`}>
                   <button type="button" className="hfx-tx" aria-expanded={open} onClick={()=>setExpandedTxId(open ? null : row.id)}>
-                    <span className="hfx-dot" style={{ background: cfg.color }} aria-hidden="true" />
-                    <span className="hfx-tx-main"><span className="hfx-tx-desc">{row.desc}</span><span className="hfx-tx-meta">{canonicalHolderDisplay(row.holder)} · {cfg.label}{row.personalFlag === 'personale' ? ` · ${T('personal')}` : ''}{row.cashflowType !== 'expense' ? ` · ${row.cashflowType === 'income' ? T('cashflowIncome') : T('cashflowExcluded')}` : ''}</span></span>
+                    <CatIcon cfg={cfg} size="md" />
+                    <span className="hfx-tx-main"><span className="hfx-tx-desc">{row.desc}</span><span className="hfx-tx-meta">{cfg.label} · {canonicalHolderDisplay(row.holder)}</span></span>
                     <span className={`hfx-tx-amt hfx-num ${row.cashflowType === 'income' ? 'is-pos' : row.cashflowType === 'excluded' ? 'is-muted' : ''}`}>{row.amountLabel}</span>
+                    <span className="hfx-tx-tags"><span>{row.sourceLabel}</span>{row.personalFlag === 'personale' && <span>{T('personal')}</span>}{row.cashflowType !== 'expense' && <span className={row.cashflowType === 'income' ? 'is-pos' : ''}>{row.cashflowType === 'income' ? T('cashflowIncome') : T('cashflowExcluded')}</span>}{row.isRefund && row.cashflowType === 'expense' && <span>{T('refund')}</span>}</span>
                   </button>
                   {open && <div className="hfx-tx-edit">
                     <label><span>{T('holder')}</span><select className="hfx-input" value={canonicalHolderDisplay(row.holder)} onChange={(e)=>overrideHolder(row, e.target.value)}>{holderOptions.map((h)=><option key={h} value={h}>{h}</option>)}</select></label>
-                    <label><span>{T('category')}</span><select className="hfx-input" value={row.categoryKey} onChange={(e)=>handleRawCategoryChange(row, e.target.value)}>{Object.entries(categoryConfig).map(([key, c]) => <option key={key} value={key}>{c.label}</option>)}<option value="__new_category__">{T('newCategory')}</option></select></label>
+                    <label><span>{T('category')}</span><select className="hfx-input" value={row.categoryKey} onChange={(e)=>handleRawCategoryChange(row, e.target.value)}>{Object.entries(categoryConfig).map(([key, c]) => <option key={key} value={key}>{c.icon || '🏷️'} {c.label}</option>)}<option value="__new_category__">{T('newCategory')}</option></select></label>
                     <label><span>{T('flag')}</span><select className="hfx-input" value={row.personalFlag} onChange={(e)=>overridePersonalFlag(row, e.target.value)}><option value="comune">{T('common')}</option><option value="personale">{T('personal')}</option></select></label>
                     <label><span>{T('cashflow')}</span><select className="hfx-input" value={row.cashflowType} onChange={(e)=>overrideCashflowExclusion(row, e.target.value)}><option value="expense">{T('cashflowExpense')}</option><option value="income">{T('cashflowIncome')}</option><option value="excluded">{T('cashflowExcluded')}</option></select></label>
-                    <div className="hfx-tx-facts"><span>{row.sourceLabel}</span>{row.paese && <span>{row.paese}</span>}{row.isRefund && <span>{T('refund')}</span>}</div>
+                    {row.paese && <div className="hfx-tx-facts"><span>{T('country')}: {row.paese}</span></div>}
                     <label className="hfx-check"><input type="checkbox" checked={selectedRawSet.has(row.id)} onChange={()=>toggleRawRowSelection(row.id)} /><span>{T('selectRow')}</span></label>
                   </div>}
                 </li>; })}</ul>

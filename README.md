@@ -214,7 +214,7 @@ From then on the format appears in the **Bank / card** list, and any file whose 
 - **Expense / Trends** — totals per member with personal/shared breakdown, category mix, account/source breakdown, income vs expenses vs net cash flow, and a recurring-aware forecast for the current month (thumbs up/down on forecast items teaches it what to expect).
 - **Income** — income by member, category and source, plus a review list of ambiguous incoming transfers; marking a row Income / Not income teaches homefin to classify similar rows the same way.
 - **Time Machine** (Profile → Data) — up to 5 named full snapshots stored in KV; download or restore (admins) at any time. Snapshots never include user accounts.
-- **Data** — the transaction table. Edit holder, category, personal/shared flag and cash-flow type (Expense / Income / Excluded) per row, or select rows for bulk edits. Admins can add manual rows and delete rows.
+- **Data** — the transaction table. Edit holder, category, personal/shared flag and cash-flow type (Expense / Income / Excluded) per row, or select rows for bulk edits. Admins can add manual rows and delete rows. On desktop, drag a column edge to resize it (double-click resets it; widths are remembered per browser). On mobile each transaction is a card with its category icon, source and tags; tap it to edit.
 - **Rules** (Profile → Rules & Logic) — "description contains X → category Y / personal or shared". Repeated manual edits become rule suggestions.
 - **Notes** — monthly notes per member next to their personal spend.
 
@@ -259,7 +259,7 @@ The value must match `APP_PASSWORD` exactly (watch for trailing spaces). Check w
 The workspace already has users. Log in with the admin account, or reset a password (next item).
 
 **I forgot my password.**
-Reset it with the setup token:
+On the login screen, click **Forgot password?**, then enter your username, the setup token (`APP_PASSWORD`) and a new password. Or do the same from the command line:
 
 ```bash
 curl -X POST "https://YOUR-APP.vercel.app/api/data?action=recover" -H "X-Homefin-Setup-Token: YOUR_APP_PASSWORD" -H "Content-Type: application/json" -d '{"username":"your_username","newPassword":"a-new-long-password"}'
