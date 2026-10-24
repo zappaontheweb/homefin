@@ -43,6 +43,20 @@ Most finance apps are built for one person and one bank. Real households share a
     <td width="50%"><img src="docs/screenshots/income.png" alt="Income tab" /><br/><sub><b>Income</b> — by member, category and source, with a review list for ambiguous transfers.</sub></td>
     <td width="50%"><img src="docs/screenshots/setup.png" alt="First-run setup wizard" /><br/><sub><b>Setup</b> — one wizard: setup token, admin, household members, starting data.</sub></td>
   </tr>
+  <tr>
+    <td width="50%"><img src="docs/screenshots/data.png" alt="Data tab: transaction table with resizable columns and category icons" /><br/><sub><b>Data</b> — every transaction, editable inline; drag a column edge to resize it.</sub></td>
+    <td width="50%"><img src="docs/screenshots/login.png" alt="Login screen with Forgot password link" /><br/><sub><b>Login</b> — with a <i>Forgot password?</i> reset that uses the setup token.</sub></td>
+  </tr>
+</table>
+
+**On mobile**
+
+<table>
+  <tr>
+    <td width="33%"><img src="docs/screenshots/mobile-overview.png" alt="Spending overview on mobile" /><br/><sub><b>Spending</b> — totals, split and monthly chart.</sub></td>
+    <td width="33%"><img src="docs/screenshots/mobile-data.png" alt="Transactions as cards on mobile" /><br/><sub><b>Data</b> — one card per transaction, grouped by day.</sub></td>
+    <td width="33%"><img src="docs/screenshots/mobile-data-edit.png" alt="Editing a transaction on mobile" /><br/><sub><b>Edit</b> — tap a card to change holder, category, flag or cash flow.</sub></td>
+  </tr>
 </table>
 
 <sub>Screenshots use the built-in fictional demo data.</sub>
