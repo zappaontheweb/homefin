@@ -1725,6 +1725,11 @@ function Login({ onLogin }) {
   const [pw, setPw] = useState('');
   const [err, setErr] = useState('');
   const [busy, setBusy] = useState(false);
+  const [resetMode, setResetMode] = useState(false);
+  const [setupToken, setSetupToken] = useState('');
+  const [newPw, setNewPw] = useState('');
+  const [newPw2, setNewPw2] = useState('');
+  const [notice, setNotice] = useState('');
   const [themeMode, setThemeMode] = useState(() => lsGet(LS.theme) || 'dark');
   const [lang, setLang] = useState(() => lsGet(LS.lang) || 'en');
   const theme = THEMES[themeMode] || THEMES.dark;
@@ -1733,6 +1738,7 @@ function Login({ onLogin }) {
 
   const submitLogin = async () => {
     setErr('');
+    setNotice('');
     setBusy(true);
     try {
       const result = await apiLogin(userId.trim(), pw);
@@ -1740,6 +1746,24 @@ function Login({ onLogin }) {
     } catch (e) {
       const message = String(e?.message || '');
       setErr(e?.status === 401 ? T('invalidLogin') : e?.status === 429 ? T('tooManyAttempts') : `${T('apiError')}: ${message}`);
+    }
+    setBusy(false);
+  };
+  const openReset = (open) => { setResetMode(open); setErr(''); setNotice(''); setSetupToken(''); setNewPw(''); setNewPw2(''); };
+  const submitReset = async () => {
+    setErr('');
+    if (!userId.trim()) return setErr(T('usernameRequired'));
+    if (!setupToken) return setErr(T('setupTokenRequired'));
+    if (newPw.length < 8) return setErr(T('passwordTooShort'));
+    if (newPw !== newPw2) return setErr(T('passwordsDontMatch'));
+    setBusy(true);
+    try {
+      await apiFetch('recover', { method: 'POST', body: { username: userId.trim(), newPassword: newPw }, headers: { 'X-Homefin-Setup-Token': setupToken } });
+      openReset(false);
+      setPw('');
+      setNotice(T('passwordResetDone'));
+    } catch (e) {
+      setErr(`${T('apiError')}: ${String(e?.message || '')}`);
     }
     setBusy(false);
   };
@@ -1764,15 +1788,27 @@ function Login({ onLogin }) {
             {[[T('rules'), T('smartCategorization')],[T('flag'), T('personalVsShared')],[T('trends'), T('monthlyClarity')]].map(([a,b]) => <div key={a}><dt>{a}</dt><dd>{b}</dd></div>)}
           </dl>
         </aside>
-        <form className="hfx-auth-card is-narrow" onSubmit={(e) => { e.preventDefault(); submitLogin(); }}>
+        {resetMode ? <form className="hfx-auth-card is-narrow" onSubmit={(e) => { e.preventDefault(); submitReset(); }}>
+          <h2 className="hfx-auth-title">{T('resetPassword')}</h2>
+          <p className="hfx-help">{T('resetPasswordHelp')}</p>
+          <label className="hfx-label"><span>{T('user')}</span><input className="hfx-field" autoComplete="username" autoCapitalize="none" value={userId} onChange={e => setUserId(e.target.value)} /></label>
+          <label className="hfx-label"><span>{T('setupStepToken')}</span><input className="hfx-field" type="password" autoComplete="off" value={setupToken} onChange={e => setSetupToken(e.target.value)} /></label>
+          <label className="hfx-label"><span>{T('newPassword')}</span><input className="hfx-field" type="password" autoComplete="new-password" value={newPw} onChange={e => setNewPw(e.target.value)} /></label>
+          <label className="hfx-label"><span>{T('confirmNewPassword')}</span><input className="hfx-field" type="password" autoComplete="new-password" value={newPw2} onChange={e => setNewPw2(e.target.value)} /></label>
+          {err && <div className="hfx-error" role="alert">{err}</div>}
+          <button type="submit" className="hfx-btn is-primary hfx-btn-block hfx-btn-lg" disabled={busy}>{busy ? T('loading') : T('resetPassword')}</button>
+          <button type="button" className="hfx-link" onClick={() => openReset(false)}>{T('back')}</button>
+        </form> : <form className="hfx-auth-card is-narrow" onSubmit={(e) => { e.preventDefault(); submitLogin(); }}>
           <h2 className="hfx-auth-title">{T('login')}</h2>
           <p className="hfx-help">{T('loginSub')}</p>
+          {notice && <p className="hfx-help" role="status">{notice}</p>}
           <label className="hfx-label"><span>{T('user')}</span><input className="hfx-field" autoComplete="username" autoCapitalize="none" value={userId} onChange={e => setUserId(e.target.value)} /></label>
           <label className="hfx-label"><span>{T('password')}</span><input className="hfx-field" type="password" autoComplete="current-password" value={pw} onChange={e => setPw(e.target.value)} /></label>
           {err && <div className="hfx-error" role="alert">{err}</div>}
           <button type="submit" className="hfx-btn is-primary hfx-btn-block hfx-btn-lg" disabled={busy}>{busy ? T('loading') : T('login')}</button>
+          <button type="button" className="hfx-link" onClick={() => openReset(true)}>{T('forgotPassword')}</button>
           <p className="hfx-help">{T('loginHelp')}</p>
-        </form>
+        </form>}
       </main>
     </div>
   );
@@ -2096,6 +2132,7 @@ Object.assign(EXTRA_I18N.it, {
   createWorkspace:'Crea workspace', invalidLogin:'Utente o password non validi', tooManyAttempts:'Troppi tentativi falliti, riprova tra qualche minuto.', apiError:'Errore API',
   loginKicker:'Dashboard privata self-hosted', loginHeadline:'Le spese di casa, finalmente leggibili.', loginTagline:'Categorie pulite, spese personali vs comuni, regole intelligenti e trend chiari in un unico cockpit.',
   loginHelp:'Gli account vengono creati da un admin in Profilo → Utenti.', changePassword:'Cambia password',
+  forgotPassword:'Password dimenticata?', resetPassword:'Reimposta password', resetPasswordHelp:'Serve il token di setup (APP_PASSWORD) di questo deployment.', usernameRequired:'Inserisci lo username.', passwordResetDone:'Password reimpostata — accedi con la nuova password',
   healthUnmatchedHolder:'Titolari non associati a un membro', healthHolderShared:'Titolare "Shared" su Amex'
 });
 Object.assign(EXTRA_I18N.en, {
@@ -2111,6 +2148,7 @@ Object.assign(EXTRA_I18N.en, {
   createWorkspace:'Create workspace', invalidLogin:'Invalid user or password', tooManyAttempts:'Too many failed attempts, try again in a few minutes.', apiError:'API error',
   loginKicker:'Self-hosted private dashboard', loginHeadline:'Household spending, finally readable.', loginTagline:'Clean categories, personal vs shared spend, smart rules and clear trends in one cockpit.',
   loginHelp:'Accounts are created by an admin in Profile → Users.', changePassword:'Change password',
+  forgotPassword:'Forgot password?', resetPassword:'Reset password', resetPasswordHelp:'Requires this deployment\'s setup token (APP_PASSWORD).', usernameRequired:'Enter your username.', passwordResetDone:'Password reset — log in with your new password',
   healthUnmatchedHolder:'Holders not matched to a member', healthHolderShared:'"Shared" holder on Amex'
 });
 Object.assign(EXTRA_I18N.it, { more:'Altro', vsPrevious:'vs periodo precedente', savingsRate:'Tasso di risparmio', net:'Netto', avgPerPeriod:'Media per periodo', people:'Persone', share:'Quota', monthlySpending:'Spesa mensile', noData:'Nessun dato nel periodo' });
